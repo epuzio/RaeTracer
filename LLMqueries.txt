@@ -1,0 +1,5 @@
+1. feature (implimented)
+2. method (gpt or copilot)
+3. query (to llm)
+4. response (from llm)
+5. code
