@@ -1,7 +1,7 @@
 #include <iostream>
-using namespace std;
 
 int main() {
+
     // Image
 
     int image_width = 256;
@@ -13,15 +13,15 @@ int main() {
 
     for (int j = 0; j < image_height; ++j) {
         for (int i = 0; i < image_width; ++i) {
-            double r = double(i) / (image_width-1); //had to set as double
-            double g = double(j) / (image_height-1);
-            double b = 0;
+            auto r = double(i) / (image_width-1);
+            auto g = double(j) / (image_height-1);
+            auto b = 0;
 
             int ir = static_cast<int>(255.999 * r);
             int ig = static_cast<int>(255.999 * g);
             int ib = static_cast<int>(255.999 * b);
 
-            std::cout << ir << ' ' << ig << ' ' << ib << std::flush;
+            std::cout << ir << ' ' << ig << ' ' << ib << '\n';
         }
     }
 }
