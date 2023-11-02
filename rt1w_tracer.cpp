@@ -18,7 +18,7 @@ int main() {
     for (int j = 0; j < image_height; ++j) {
         clog << "[" << ((j*1.0) / image_height) << "%]" << "\r REMAINING LINES: " << (image_height - j) << ' ' << flush;
         for (int i = 0; i < image_width; ++i) {
-            auto pixel_color = color(double(i)/(image_width-1), double(j)/(image_height-1), 0);
+            auto pixel_color = color(double(i)/(image_width-1), double(j)/(image_height-1), double(i)/(256-image_width));
             write_color(std::cout, pixel_color);
         }
     }
