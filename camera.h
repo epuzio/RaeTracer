@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "rtweekend.h"
+#include "raytracer.h"
 
 #include "color.h"
 #include "shapes_hit.h"
@@ -17,8 +17,6 @@ class camera {
    
     void render(const hittable& world) {
         initialize();
-
-        // Render
         cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
         //Writing to output + progress bar
@@ -37,7 +35,11 @@ class camera {
     }
 
   private:
-    /* Private Camera Variables Here */
+    int image_height;   // Rendered image height
+    point3 center;         // Camera center
+    point3 pixel00_loc;    // Location of pixel 0, 0
+    vec3 pixel_delta_u;  // Offset to pixel to the right
+    vec3 pixel_delta_v;  // Offset to pixel below
 
     void initialize() {
         // Set height based on width and aspect ratio
@@ -49,7 +51,6 @@ class camera {
         auto focal_length = 1.0;
         auto viewport_height = 2.0;
         auto viewport_width = viewport_height * (static_cast<double>(image_width)/image_height);
-        auto camera_center = point3(0, 0, 0);
 
         // Camera vectors from edge to edge
         auto viewport_u = vec3(viewport_width, 0, 0);
