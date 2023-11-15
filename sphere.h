@@ -4,9 +4,9 @@
 #include "shape.h"
 #include "vec3.h"
 
-class sphere : public hittable {
+class sphere : public shape {
   public:
-    sphere(point3 _center, double _radius) : center(_center), radius(_radius) {}
+    sphere(point3 c, double r) : center(c), radius(r) {}
 
     bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const override {
         vec3 oc = r.origin() - center;

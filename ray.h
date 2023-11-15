@@ -2,24 +2,21 @@
 #define RAY_H
 
 #include "vec3.h"
-#include "shape.h"
 
 class ray {
+  private:
+    point3 originPoint;
+    vec3 rayDirection;
+
   public:
-    ray() {}
+    ray(const point3& origin, const vec3& direction) : originPoint(origin), rayDirection(normalize(direction)) {}
 
-    ray(const point3& origin, const vec3& direction) : orig(origin), dir(direction) {}
-
-    point3 origin() const  { return orig; }
-    vec3 direction() const { return dir; }
+    point3 origin() const  { return originPoint; }
+    vec3 direction() const { return rayDirection; }
 
     point3 at(double t) const {
-        return orig + t*dir;
+        return originPoint + t*rayDirection;
     }
-
-  private:
-    point3 orig;
-    vec3 dir;
 };
 
 #endif

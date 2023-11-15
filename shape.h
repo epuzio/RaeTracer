@@ -2,6 +2,7 @@
 #define SHAPE_H
 
 #include "ray.h"
+#include "interval.h"
 
 class hit_record {
   public:
@@ -22,7 +23,6 @@ class hit_record {
 class shape {
   public:
     virtual ~shape() = default;
-
     virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const = 0;
 };
 
