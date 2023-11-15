@@ -26,50 +26,34 @@ int main() {
         try {
             inputFile >> input; // Parse JSON from file
             string rendermode = input["rendermode"];
-            if(rendermode == "binary"){
-                //parse for nbounces, lightsources, material of objects
-            }
 
             //Set camera variables from JSON input:
             json cameraInput = input["camera"];
-            camera = new Camera(cameraInput);
+            camera = new Camera(cameraInput["width"], cameraInput["height"], <point3>(cameraInput["cameraPosition"]), <vec3>(cameraInput["lookat"]), <vec3>(cameraInput["upvector"]), cameraInput["fov"], cameraInput["exposure"]);
             
-            
-            //Set scene variables from JSON input (wip):
+            //Get scene variables from JSON input:
             json sceneInput = input["scene"];
             json backgroundInput = sceneInput["backgroundcolor"];
             json shapesInput = sceneInput["shapes"];
+            json lightsInput = sceneInput["lightsources"];
+            json materialsInput = sceneInput["materials"];
+            
+            //Set background color from JSON input:
+            background_color = color(<double>(backgroundInput[0]), <double>(backgroundInput[1]), <double>(backgroundInput[2]));
 
-            if(rendermode == "binary"){
-                for (const auto& s : shapesInput) {
-                    if (shapeType == "Sphere"){
-                        world.add(make_shared<sphere>(<vec3>(shapesInput["center"]), shapesInput["radius"]));
-                    }
-                    if (shapeType == "Triangle"){
-                        //create triangle (haven't gotten here yet)
-                    }
-                    if (shapeType == "Cylinder"){
-                        //create cylinder (haven't gotten here yet either)
-                    }
+            //Push shapes from JSON input:
+            for (const auto& s : shapesInput) {
+                if (shapeType == "Sphere"){
+                    world.add(sphere(<vec3>(shapesInput["center"]), shapesInput["radius"]));
                 }
-            }
-            else if(rendermode == "phong"){
-                for (const auto& s : shapesInput) {
-                    if (shapeType == "Sphere"){
-                        //create sphere
-                        world.add()
-                    }
-                    if (shapeType == "Triangle"){
-                        //create triangle
-                    }
-                    if (shapeType == "Cylinder"){
-                        //create cylinder
-                    }
+                if (shapeType == "Triangle"){
+                    world.add(triangle(<vec3>(shapesInput["v0"]), <vec3>(shapesInput["v1"]), <vec3>(shapesInput["v2"])));
+                }
+                if (shapeType == "Cylinder"){
+                    world.add(cylinder(<point3>(shapesInput["center"]), <vec3>(shapesInput["axis"]), shapesInput["radius"], shapesInput["height"]));
                 }
             }
             
-
-           
         } catch (json::parse_error& e) {
             cerr << "Parse error: " << e.what() << endl;
         }
@@ -77,18 +61,6 @@ int main() {
         cerr << "Unable to open json file." << endl;
     }
 
-
-    // shapes_hit world;
-
-    // world.add(make_shared<sphere>(point3(0, 0, -1), .5));
-    // world.add(make_shared<sphere>(point3(0, -100.5, -1), 100));
-
-
-    // camera.aspect_ratio = 16.0/9.0;
-    // camera.image_width = 400;
-
-    // camera.render(world);
-
-    
+    camera.render(world);
 }
     

@@ -1,13 +1,13 @@
 #ifndef INTERVAL_H
 #define INTERVAL_H
 #include <algorithm>
+//rewrite
 
 class interval {
   public:
     double min, max;
 
-    interval() : min(+INT_MAX), max(-INT_MAX) {} // Default interval is empty
-
+    interval() : min(+INT_MAX), max(-INT_MAX) {}
     interval(double _min, double _max) : min(_min), max(_max) {}
 
     bool contains(double x) const {

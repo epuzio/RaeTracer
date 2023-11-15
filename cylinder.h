@@ -50,9 +50,10 @@ class cylinder : public shape {
         return false; // No intersection
       }
   private:
-    point3 center;
+    point3 center; //center of the cylinder
+    vec3 axis; //line where the cylinder lies
     double radius;
-    vec3 height;
+    double height;
 };
 
 #endif

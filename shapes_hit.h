@@ -27,7 +27,8 @@ class shapes_hit : public shape {
         bool hit_anything = false;
         auto closest_so_far = ray_t.max;
 
-        for (const auto& object : objects) {
+        for (const auto& object : objects) { 
+            //iterate through all objects in scene, return object closest to camera along ray
             if (object->hit(r, interval(ray_t.min, closest_so_far), temp_rec)) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
