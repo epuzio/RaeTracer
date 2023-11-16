@@ -4,14 +4,16 @@
 #include <cmath>
 #include <limits>
 #include <memory>
+#include <nlohmann/json.hpp>
+#include <fstream>
 
 
 // Usings
-
 using std::shared_ptr;
 using std::make_shared;
 using std::sqrt;
 
+//stuff from rt1w, might get rid of ngl
 // Constants
 
 const double infinity = std::numeric_limits<double>::infinity();
@@ -33,9 +35,6 @@ inline double random_double(double min, double max) {
 } //
 
 
-// Common Headers
 
-#include "ray.h"
-#include "vec3.h"
 
 #endif
