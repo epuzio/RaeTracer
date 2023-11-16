@@ -2,7 +2,7 @@
 #include "camera.h"
 #include "color.h"
 #include "shape.h"
-#include "shapes_hit.h"
+#include "scene.h"
 #include "sphere.h"
 
 #include "interval.h"
@@ -15,7 +15,7 @@ using namespace std;
 using json = nlohmann::json;
 
 int main() {
-    shapes_hit world;
+    scene world;
     Camera camera;
 
     //JSON input
@@ -41,7 +41,7 @@ int main() {
             //Set background color from JSON input:
             background_color = color(<double>(backgroundInput[0]), <double>(backgroundInput[1]), <double>(backgroundInput[2]));
 
-            //Push shapes from JSON input:
+            //Push shapes from JSON input: (and materials (to-do))
             for (const auto& s : shapesInput) {
                 if (shapeType == "Sphere"){
                     world.add(sphere(<vec3>(shapesInput["center"]), shapesInput["radius"]));
@@ -53,6 +53,7 @@ int main() {
                     world.add(cylinder(<point3>(shapesInput["center"]), <vec3>(shapesInput["axis"]), shapesInput["radius"], shapesInput["height"]));
                 }
             }
+            //Push lights from JSON input (to-do):
             
         } catch (json::parse_error& e) {
             cerr << "Parse error: " << e.what() << endl;
@@ -60,7 +61,6 @@ int main() {
     } else {
         cerr << "Unable to open json file." << endl;
     }
-
     camera.render(world);
 }
     

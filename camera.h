@@ -4,7 +4,7 @@
 #include "raytracer.h"
 
 #include "color.h"
-#include "shapes_hit.h"
+#include "scene.h"
 #include "vec3.h"
 
 #include <iostream>
@@ -31,7 +31,7 @@ class camera {
     double exposure;
     
     //not from JSON input:
-    int numSamples = 5; //to prevent aliasing
+    int numSamples = 3; //to prevent aliasing
     vec3 right, up, forward; //basis vectors for camera cameraPosition
 
     Camera(double b, double rm, int w, int h, const vec3& pos, const vec3& look, const vec3& upVec, double fieldOfView, double exp)
@@ -91,24 +91,63 @@ class camera {
         if (nbounces <= 0) {
             return color(0,0,0);
         }
-        if(rendermode == "binary"){
-            return color(255, 0, 0);
-        } 
-        // else if (rendermode == "phong"){
-        //     hit_record rec;
-        //     if (world.hit(r, 0.001, infinity, rec)) {
-        //         ray scattered;
-        //         color attenuation;
-        //         if (rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
-        //             return attenuation * rayColor(scattered, world, nbounces - 1);
-        //         }
-        //         return color(0,0,0);
-        //     }
-        //     vec3 unit_direction = normalize(r.direction());
-        //     double t = 0.5 * (unit_direction.y() + 1.0);
-        //     return (1.0 - t) * color(1.0,1.0,1.0) + t * color(0.5,0.7,1.0);
-        // }
+
+        scene rec;
+        if(world.hit(r, interval(0, infinity), rec)) { //copilot autofill
+        //rec is now eqivalent to closest object hit by ray btw
+            if(rendermode == "binary"){
+                return color(255, 0, 0);
+            } 
+            else if (rendermode == "phong"){
+                return phongShade(r, rec);
+            }
+        }
     }
+
+    vec3 phongShade(const Ray& ray, const shapes_hit& world) {
+        vec3 ambientColor = {0.1f, 0.1f, 0.1f}; // Ambient light color
+        vec3 lightDirection = {-1.0f, 1.0f, -1.0f}; // Example light direction
+
+        vec3 finalColor = {0.0f, 0.0f, 0.0f};
+
+        Object closestObject;
+        if (scene.hit(ray, closestObject)) {
+            vec3 normal = {...}; // Calculate surface normal at the intersection point
+
+            // Ambient light contribution
+            vec3 ambientContribution = {
+                ambientColor.x * closestObject.material.ambientColor.x,
+                ambientColor.y * closestObject.material.ambientColor.y,
+                ambientColor.z * closestObject.material.ambientColor.z
+            };
+
+            // Diffuse light contribution
+            float cosTheta = std::max(0.0f, normal.x * lightDirection.x + normal.y * lightDirection.y + normal.z * lightDirection.z);
+            vec3 diffuseContribution = {
+                cosTheta * closestObject.material.diffuseColor.x,
+                cosTheta * closestObject.material.diffuseColor.y,
+                cosTheta * closestObject.material.diffuseColor.z
+            };
+
+            // Specular light contribution
+            vec3 viewDirection = {...}; // Calculate view direction
+            vec3 reflectionDirection = {...}; // Calculate reflection direction
+            float cosAlpha = std::max(0.0f, reflectionDirection.x * lightDirection.x + reflectionDirection.y * lightDirection.y + reflectionDirection.z * lightDirection.z);
+            float specularIntensity = pow(cosAlpha, closestObject.material.shininess);
+            vec3 specularContribution = {
+                specularIntensity * closestObject.material.specularColor.x,
+                specularIntensity * closestObject.material.specularColor.y,
+                specularIntensity * closestObject.material.specularColor.z
+            };
+
+            // Final color calculation
+            finalColor.x = ambientContribution.x + diffuseContribution.x + specularContribution.x;
+            finalColor.y = ambientContribution.y + diffuseContribution.y + specularContribution.y;
+            finalColor.z = ambientContribution.z + diffuseContribution.z + specularContribution.z;
+    }
+
+    return finalColor;
+}
 };
 
 #endif

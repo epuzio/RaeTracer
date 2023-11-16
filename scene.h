@@ -1,20 +1,20 @@
-#ifndef SHAPES_HIT
-#define SHAPES_HIT
+#ifndef SCENE_H
+#define SCENE_H
 
 #include "shape.h"
-
 #include <memory>
 #include <vector>
 
 using std::shared_ptr;
 using std::make_shared;
 
-class shapes_hit : public shape {
+//This class stores all the objects in a scene (lights and shapes) :P
+class scene : public shape {
   public:
     std::vector<shared_ptr<shape>> objects;
 
-    shapes_hit() {}
-    shapes_hit(shared_ptr<shape> object) { add(object); }
+    scene() {}
+    scene(shared_ptr<shape> object) { add(object); }
 
     void clear() { objects.clear(); }
 
@@ -28,14 +28,13 @@ class shapes_hit : public shape {
         auto closest_so_far = ray_t.max;
 
         for (const auto& object : objects) { 
-            //iterate through all objects in scene, return object closest to camera along ray
+            //iterate through all objects in scene, set rec to be the object closest to camera
             if (object->hit(r, interval(ray_t.min, closest_so_far), temp_rec)) {
                 hit_anything = true;
                 closest_so_far = temp_rec.t;
                 rec = temp_rec;
             }
         }
-
         return hit_anything;
     }
 };
