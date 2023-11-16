@@ -8,16 +8,17 @@
 class cylinder : public shape {
   public:
     cylinder(){}
-    cylinder(point3 center, double radius, vec3 height) : center(center), radius(radius), height(height) {}
+    cylinder(point3 center, vec3 axis, double radius, double height)
+        : center(center), axis(axis), radius(radius), height(height) {}
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override{
         // Ray parameters
         vec3 P = r.origin();
         vec3 V = r.direction();
 
         // Solve for the intersection using quadratic equation coefficients
-        float a = V.x() * V.x() + V.z() * V.z();
-        float b = 2.0 * (P.x() * V.x() + P.z() * V.z() - center.x() * V.x() - center.z() * V.z());
-        float c = P.x() * P.x() + P.z() * P.z() - center.x() * center.x() - center.z() * center.z() - radius * radius;
+        float a = V.x * V.x + V.z * V.z;
+        float b = 2.0 * (P.x * V.x + P.z * V.z - center.x * V.x - center.z * V.z);
+        float c = P.x * P.x + P.z * P.z - center.x * center.x - center.z * center.z - radius * radius;
 
         // Solve quadratic equation: at^2 + bt + c = 0
         float discriminant = b * b - (4 * (a * c));

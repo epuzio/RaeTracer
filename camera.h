@@ -16,10 +16,9 @@
 using namespace std;
 
 class camera {
-
   public:
     //world from JSON input:
-    double nbounces;
+    int nbounces;
     string rendermode;
     //camera from json input
     string type; //it's always going to be pinhole?
@@ -35,6 +34,7 @@ class camera {
     int numSamples = 3; //to prevent aliasing
     vec3 right, up, forward; //basis vectors for camera cameraPosition
 
+    camera() {}
     camera(double b, string rm, int w, int h, const vec3& pos, const vec3& look, const vec3& upVec, double fieldOfView, double exp)
         : nbounces(b), rendermode(rm), width(w), height(h), cameraPosition(pos), lookAt(look), upVector(upVec), fov(fieldOfView), exposure(exp) {
         // Calculate basis vectors for camera orientation //copilot (modified)
@@ -43,7 +43,7 @@ class camera {
         up = normalize(cross(right,forward));
     }
    
-   vec3 render(const scene& world) const {
+   void render(const scene& world) const {
         vec3 rays;
         // Calculate viewport dimensions //copilot
         double aspectRatio = static_cast<double>(width) / height;
@@ -100,6 +100,7 @@ class camera {
                 // return phongShade(r, rec);
             }
         }
+        return color(0,0,0); //if no object hit, return background color
     }
 
     // vec3 phongShade(const ray& ray, const scene& world) {
