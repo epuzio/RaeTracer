@@ -20,7 +20,7 @@ using point3 = vec3;
 
 int main() {
     scene world;
-    camera camera;
+    camera cam;
 
     //JSON input
     ifstream inputFile("binary_sphere.json");
@@ -34,7 +34,7 @@ int main() {
 
             //Set camera variables from JSON input:
             json cameraInput = input["camera"];
-            camera = camera( //gpt for formatting
+            cam = camera( //gpt for formatting
                         nbounces,
                         rendermode,
                         cameraInput["width"].get<int>(),
@@ -71,7 +71,7 @@ int main() {
             //Push shapes from JSON input: (and materials (to-do))
             for (const auto& s : shapesInput) {
                 if (s["type"] == "Sphere"){
-                    world.add(sphere(
+                    world.add(make_shared<sphere>(
                         point3(
                             s["center"][0].get<double>(),
                             s["center"][1].get<double>(),
@@ -81,7 +81,7 @@ int main() {
                     ));
                 }
                 if (s["type"] == "Triangle"){
-                    world.add(triangle(
+                    world.add(make_shared<triangle>(
                         vec3(
                             s["v0"][0].get<double>(),
                             s["v0"][1].get<double>(),
@@ -100,7 +100,7 @@ int main() {
                     ));
                 }
                 if (s["type"] == "Cylinder"){
-                    world.add(cylinder(
+                    world.add(make_shared<cylinder>(
                         point3(
                             s["center"][0].get<double>(),
                             s["center"][1].get<double>(),
@@ -124,6 +124,6 @@ int main() {
     } else {
         cerr << "Unable to open json file." << endl;
     }
-    camera.render(world);
+    cam.render(world);
 }
     
