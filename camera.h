@@ -75,10 +75,10 @@ class camera {
                 for (int s = 0; s < numSamples; ++s) {
                     double u = (x + random_double()) * pixelWidth - halfWidth;
                     double v = (y + random_double()) * pixelHeight - halfHeight;
-                    ray r(cameraPosition, topLeft + u * right - v * up - cameraPosition); //
+                    ray r(cameraPosition, topLeft + u * right - v * up - cameraPosition); 
                     pixelColor += rayColor(r, world);
                 }
-                writeColor(cout, pixelColor, numSamples);
+                writeColor(cout, pixelColor, numSamples); //todo: write to image file
             }
 
         }
