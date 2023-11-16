@@ -3,6 +3,7 @@
 
 #include "ray.h"
 #include "interval.h"
+#include "material.h"
 
 class hit_record {
   public:
@@ -23,7 +24,7 @@ class hit_record {
 
 class shape {
   public:
-    virtual ~shape() = default;
+    virtual ~shape() {};
     virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const = 0;
 };
 

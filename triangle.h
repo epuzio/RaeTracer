@@ -13,7 +13,7 @@ class triangle : public shape {
         //Using Möller-Trumbore algorithm:
         vec3 edge1 = v1 - v0;
         vec3 edge2 = v2 - v0;
-        vec3 h = cross(r.direction(), edge2);
+        vec3 h = cross(normalize(r.direction()), edge2);
         float a = dot(edge1, h);
 
         //if a is very close to 0, ray either misses or is parallel to triangle
@@ -21,17 +21,16 @@ class triangle : public shape {
           return false;
         }
 
-
         float f = 1.0f / a;
         vec3 s = r.origin() - v0; //ray from origin to v0
         float u = f * dot(s, h); //barycentric coordinate
 
         if (u < 0.0f || u > 1.0f) {
-            return false;
+          return false;
         }
 
         vec3 q = cross(s, edge1);
-        float v = f * dot(r.direction(), q);
+        float v = f * dot(normalize(r.direction()), q);
 
         if (v < 0.0f || u + v > 1.0f) {
             return false;
@@ -39,12 +38,11 @@ class triangle : public shape {
 
         float t = f * dot(edge2, q);
 
-        if (t < t_min || t > t_max) {
+        if (t < ray_t.min || t > ray_t.max) {
             return false;
         }
 
-        rec.intersectionPoint = r.at(t);
-
+        rec.p = r.at(t);
         return true; // Ray intersects the triangle
     }
 

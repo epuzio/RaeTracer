@@ -6,96 +6,140 @@
 using namespace std;
 using std::sqrt;
 
+
 class vec3 {
   public:
-    double e[3];
+    double x, y, z;
 
-    vec3() : e{0,0,0} {}
-    vec3(double e0, double e1, double e2) : e{e0, e1, e2} {}
+    vec3() : x(0), y(0), z(0) {}
+    vec3(double x, double y, double z) : x(x), y(y), z(z) {}
 
-    double x() const { return e[0]; }
-    double y() const { return e[1]; }
-    double z() const { return e[2]; }
-
-    vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
-    double operator[](int i) const { return e[i]; }
-    double& operator[](int i) { return e[i]; }
-
+    //vector operator overloads //copilot
+    vec3 operator-() const { return vec3(-x, -y, -z); }
+    vec3 operator+() const { return *this; }
     vec3& operator+=(const vec3 &v) {
-        e[0] += v.e[0];
-        e[1] += v.e[1];
-        e[2] += v.e[2];
+        x += v.x; 
+        y += v.y; 
+        z += v.z; 
+        return *this; 
+    }
+    vec3& operator-=(const vec3 &v) {
+        x -= v.x; 
+        y -= v.y; 
+        z -= v.z; 
         return *this;
     }
-
-    vec3& operator*=(double t) {
-        e[0] *= t;
-        e[1] *= t;
-        e[2] *= t;
+    vec3& operator*=(const double t) {
+        x *= t; 
+        y *= t; 
+        z *= t; 
         return *this;
     }
-
-    vec3& operator/=(double t) {
-        return *this *= 1/t;
+    vec3& operator/=(const double t) {
+        return *this *= 1/t; 
     }
-
     double length() const {
-        return sqrt(length_squared());
+        return sqrt(length_squared()); 
     }
-
     double length_squared() const {
-        return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
+        return x*x + y*y + z*z; 
     }
 };
 
-// point3 is just an alias for vec3, but useful for geometric clarity in the code.
-using point3 = vec3;
-
-
-// Vector Utility Functions
-
-inline std::ostream& operator<<(std::ostream &out, const vec3 &v) {
-    return out << v.e[0] << ' ' << v.e[1] << ' ' << v.e[2];
+//vector utility functions: //copilot
+inline ostream& operator<<(ostream &out, const vec3 &v) {
+    return out << v.x << ' ' << v.y << ' ' << v.z;
 }
-
 inline vec3 operator+(const vec3 &u, const vec3 &v) {
-    return vec3(u.e[0] + v.e[0], u.e[1] + v.e[1], u.e[2] + v.e[2]);
+    return vec3(u.x + v.x, u.y + v.y, u.z + v.z); 
 }
-
 inline vec3 operator-(const vec3 &u, const vec3 &v) {
-    return vec3(u.e[0] - v.e[0], u.e[1] - v.e[1], u.e[2] - v.e[2]);
+    return vec3(u.x - v.x, u.y - v.y, u.z - v.z); 
 }
-
 inline vec3 operator*(const vec3 &u, const vec3 &v) {
-    return vec3(u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2]);
+    return vec3(u.x * v.x, u.y * v.y, u.z * v.z); 
 }
-
 inline vec3 operator*(double t, const vec3 &v) {
-    return vec3(t*v.e[0], t*v.e[1], t*v.e[2]);
+    return vec3(t*v.x, t*v.y, t*v.z); 
 }
-
 inline vec3 operator*(const vec3 &v, double t) {
-    return t * v;
+    return t * v; 
 }
-
 inline vec3 operator/(vec3 v, double t) {
-    return (1/t) * v;
+    return (1/t) * v; 
 }
-
 inline double dot(const vec3 &u, const vec3 &v) {
-    return u.e[0] * v.e[0]
-         + u.e[1] * v.e[1]
-         + u.e[2] * v.e[2];
+    return u.x * v.x + u.y * v.y + u.z * v.z; 
 }
-
 inline vec3 cross(const vec3 &u, const vec3 &v) {
-    return vec3(u.e[1] * v.e[2] - u.e[2] * v.e[1],
-                u.e[2] * v.e[0] - u.e[0] * v.e[2],
-                u.e[0] * v.e[1] - u.e[1] * v.e[0]);
+    return vec3(u.y * v.z - u.z * v.y, 
+                u.z * v.x - u.x * v.z, 
+                u.x * v.y - u.y * v.x);
+}
+inline vec3 normalize(vec3 v) {
+    v.x /= v.length();
+    v.y /= v.length();
+    v.z /= v.length();
+    return v;
 }
 
-inline vec3 normalize(vec3 v) {
-    return v / v.length();
-}
+//add aliases for vec3 //copilot
+using point3 = vec3; // 3D point
+using color = vec3 ; // RGB color
 
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//original copilot:
+// vector utility functions: //copilot
+// inline ostream& operator<<(ostream &out, const vec3 &v) {
+//     return out << v.x[0] << ' ' << v.y[1] << ' ' << v.z[2];
+// }
+// inline vec3 operator+(const vec3 &u, const vec3 &v) {
+//     return vec3(u.x[0] + v.x[0], u.y[1] + v.y[1], u.z[2] + v.z[2]); 
+// }
+// inline vec3 operator-(const vec3 &u, const vec3 &v) {
+//     return vec3(u.x[0] - v.x[0], u.y[1] - v.y[1], u.z[2] - v.z[2]); 
+// }
+// inline vec3 operator*(const vec3 &u, const vec3 &v) {
+//     return vec3(u.x[0] * v.x[0], u.y[1] * v.y[1], u.z[2] * v.z[2]); 
+// }
+// inline vec3 operator*(double t, const vec3 &v) {
+//     return vec3(t*v.x[0], t*v.y[1], t*v.z[2]); 
+// }
+// inline vec3 operator*(const vec3 &v, double t) {
+//     return t * v; 
+// }
+// inline vec3 operator/(vec3 v, double t) {
+//     return (1/t) * v; 
+// }
+// inline double dot(const vec3 &u, const vec3 &v) {
+//     return u.x[0] * v.x[0] + u.y[1] * v.y[1] + u.z[2] * v.z[2]; 
+// }
+// inline vec3 cross(const vec3 &u, const vec3 &v) {
+//     return vec3(u.y[1] * v.z[2] - u.z[2] * v.y[1], 
+//                 u.z[2] * v.x[0] - u.x[0] * v.z[2], 
+//                 u.x[0] * v.y[1] - u.y[1] * v.x[0]);
+// }
+// inline vec3 unit_vector(vec3 v) {
+//     return v / v.length(); 
+// }
+
+// //add aliases for vec3 //copilot
+// using point3 = vec3; // 3D point
+// using color = vec3; // RGB color

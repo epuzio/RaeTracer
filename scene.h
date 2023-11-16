@@ -11,7 +11,7 @@ using std::make_shared;
 //This class stores all the objects in a scene (lights and shapes) :P
 class scene : public shape {
   public:
-    std::vector<shared_ptr<shape>> objects;
+    vector<shared_ptr<shape> > objects;
 
     scene() {}
     scene(shared_ptr<shape> object) { add(object); }
@@ -22,8 +22,8 @@ class scene : public shape {
         objects.push_back(object);
     }
 
-    bool hit(const ray& r, interval ray_t, shape& rec) const override {
-        shape temp_rec;
+    bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
+        hit_record temp_rec;
         bool hit_anything = false;
         auto closest_so_far = ray_t.max;
 
