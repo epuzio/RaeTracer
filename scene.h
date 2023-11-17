@@ -2,6 +2,7 @@
 #define SCENE_H
 
 #include "shape.h"
+#include "light.h"
 #include <memory>
 #include <vector>
 
@@ -12,6 +13,7 @@ using std::make_shared;
 class scene : public shape {
   public:
     vector<shared_ptr<shape> > objects;
+    vector<shared_ptr<pointlight> > lights;
     vec3 backgroundcolor;
 
     scene() {}
@@ -21,6 +23,10 @@ class scene : public shape {
 
     void add(shared_ptr<shape> object) {
         objects.push_back(object);
+    }
+
+    void addLight(shared_ptr<pointlight> light) {
+        lights.push_back(light);
     }
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override {

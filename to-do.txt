@@ -1,4 +1,4 @@
 cosmetic stuff
 
 1. make the functions setting parameters based off the json file less bad 
-2. 
+2. move the headers into a better file hierarchy

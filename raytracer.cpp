@@ -7,6 +7,7 @@
 #include "triangle.h"  
 #include "cylinder.h"
 #include "material.h"
+#include "light.h"
 
 #include "interval.h"
 #include "vec3.h"
@@ -23,28 +24,47 @@ void setCameraParameters(camera& cam, json input){
     int nbounces = (rendermode == "phong") ? input["nbounces"].get<int>() : 1;
     json cameraInput = input["camera"];
     cam = camera( //gpt for formatting
-            nbounces,
-            rendermode,
-            cameraInput["width"].get<int>(),
-            cameraInput["height"].get<int>(),
-            vec3(
-                cameraInput["position"][0].get<double>(),
-                cameraInput["position"][1].get<double>(),
-                cameraInput["position"][2].get<double>()
-            ),
-            vec3(
-                cameraInput["lookAt"][0].get<double>(),
-                cameraInput["lookAt"][1].get<double>(),
-                cameraInput["lookAt"][2].get<double>()
-            ),
-            vec3(
-                cameraInput["upVector"][0].get<double>(),
-                cameraInput["upVector"][1].get<double>(),
-                cameraInput["upVector"][2].get<double>()
-            ),
-            cameraInput["fov"].get<double>(),
-            cameraInput["exposure"].get<double>()
-        );
+        nbounces,
+        rendermode,
+        cameraInput["width"].get<int>(),
+        cameraInput["height"].get<int>(),
+        vec3(
+            cameraInput["position"][0].get<double>(),
+            cameraInput["position"][1].get<double>(),
+            cameraInput["position"][2].get<double>()
+        ),
+        vec3(
+            cameraInput["lookAt"][0].get<double>(),
+            cameraInput["lookAt"][1].get<double>(),
+            cameraInput["lookAt"][2].get<double>()
+        ),
+        vec3(
+            cameraInput["upVector"][0].get<double>(),
+            cameraInput["upVector"][1].get<double>(),
+            cameraInput["upVector"][2].get<double>()
+        ),
+        cameraInput["fov"].get<double>(),
+        cameraInput["exposure"].get<double>()
+    );
+}
+
+void setLightParameters(scene&world, json lightsInput){
+    for(const auto& l : lightsInput){ //copilot
+        if (l["type"] == "pointlight"){
+            world.addLight(make_shared<pointlight>(
+                vec3(
+                    l["position"][0].get<double>(),
+                    l["position"][1].get<double>(),
+                    l["position"][2].get<double>()
+                ),
+                vec3 (
+                    l["intensity"][0].get<double>(),
+                    l["intensity"][1].get<double>(),
+                    l["intensity"][2].get<double>()
+                )
+            ));
+        }
+    } //
 }
 
 material setMaterialParameters(scene&world, json s){
@@ -70,13 +90,19 @@ material setMaterialParameters(scene&world, json s){
     );
 }
 
+
+
 void setWorldParameters(scene& world, json input){
     json sceneInput = input["scene"];
     json backgroundInput = sceneInput["backgroundcolor"];
+    json lightsInput = sceneInput["lightsources"];
     json shapesInput = sceneInput["shapes"];
 
     //Set background color from JSON input:
     world.backgroundcolor = color((backgroundInput[0]).get<double>(), backgroundInput[1].get<double>(), backgroundInput[2].get<double>());
+
+    //Set lights from JSON input:
+    setLightParameters(world, lightsInput);
 
     //Push shapes from JSON input: (and materials (to-do))
     for (const auto& s : shapesInput) {
@@ -137,7 +163,7 @@ int main() {
     camera cam;
 
     //JSON input
-    ifstream inputFile("binary_debug.json");
+    ifstream inputFile("debug.json");
     json input;
 
     if (inputFile.is_open()) {
@@ -145,17 +171,14 @@ int main() {
             inputFile >> input; // Parse JSON from file
             setCameraParameters(cam, input);
             setWorldParameters(world, input);
-
-            // To-do: push back materials to shape, lights to world.
-            
         } catch (json::parse_error& e) {
             cerr << "Parse error: " << e.what() << endl;
         }
     } else {
         cerr << "Unable to open json file." << endl;
     }
+
+    cout << world.objects.size() << endl;
+    cout << world.lights.size() << endl;
     cam.render(world);
 };
-
-
-    

@@ -86,6 +86,8 @@ class camera {
         clog << "\rDone in " << (clock() - c) / CLOCKS_PER_SEC << " ms.       \n";
     }
 
+
+
 //GET COLOR OF RAY
     //rayColor function //copilot
     color rayColor(const ray& r, const scene& world) const {
@@ -100,7 +102,6 @@ class camera {
         } 
 
         if(rendermode == "phong"){
-            cout << "it's phong" << endl;
             if (world.hit(r, interval(0, infinity), rec)) {
                 vec3 normal = normalize(rec.normal);
                 //ambient light is diffuse color * .5 <- this is a hack
@@ -134,7 +135,7 @@ class camera {
                 // }
                         
                 // Ensure final pixel color is within the valid range [0, 1]
-                clamp(pixelColor, 0.0, 1.0);
+                // pixelColor = clamp(pixelColor, 0.0, 1.0);
                 return color(pixelColor);
             }
             return world.backgroundcolor; // If no object hit, return background color
@@ -143,14 +144,6 @@ class camera {
     }
 };
 
-void clamp(vec3& color, double min, double max) {
-    if (color.x < min) { color.x = min; }
-    if (color.y < min) { color.y = min; }
-    if (color.z < min) { color.z = min; }
-    if (color.x > max) { color.x = max; }  
-    if (color.y > max) { color.y = max; }
-    if (color.z > max) { color.z = max; }
-}
 
 #endif
 

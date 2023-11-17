@@ -6,8 +6,6 @@
 #include "vec3.h"
 #include "color.h"
 
-class hit_record;
-
 class material {
   public:
     double ks;
