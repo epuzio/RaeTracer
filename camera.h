@@ -100,46 +100,57 @@ class camera {
         } 
 
         if(rendermode == "phong"){
+            cout << "it's phong" << endl;
             if (world.hit(r, interval(0, infinity), rec)) {
                 vec3 normal = normalize(rec.normal);
-                vec3 surfaceColor = world.colorAt(rec); // Get surface color from the object hit
+                //ambient light is diffuse color * .5 <- this is a hack
+                vec3 surfaceColor = rec.bp.diffusecolor*0.5; 
                 
-                vec3 ambient = world.ambientColor * surfaceColor; // Ambient reflection
+                vec3 ambient = world.backgroundcolor * surfaceColor; // Ambient reflection
                 
                 vec3 pixelColor = ambient; // Initialize with ambient light
                         
                         // Iterate through each light source in the scene
-                for (const auto& light : world.lights) {
-                    vec3 lightDir = unit_vector(light.position - rec.p);
-                    double diffuseFactor = dot(normal, lightDir); // Diffuse reflection
+                // for (const auto& light : world.lights) {
+                //     vec3 lightDir = normalize(light.position - rec.p);
+                //     double diffuseFactor = dot(normal, lightDir); // Diffuse reflection
                     
-                    if (diffuseFactor > 0) {
-                            // Calculate diffuse contribution
-                        vec3 diffuse = light.intensity * surfaceColor * diffuseFactor;
-                        pixelColor += diffuse;
+                //     if (diffuseFactor > 0) {
+                //             // Calculate diffuse contribution
+                //         vec3 diffuse = light.intensity * surfaceColor * diffuseFactor;
+                //         pixelColor += diffuse;
                         
-                        vec3 viewDir = unit_vector(cameraPosition - rec.p);
-                        vec3 reflectDir = reflect(-lightDir, normal); // Calculate reflection direction
+                //         vec3 viewDir = unit_vector(cameraPosition - rec.p);
+                //         vec3 reflectDir = reflect(-lightDir, normal); // Calculate reflection direction
                         
-                        // Calculate specular contribution using the Phong equation
-                        double specularFactor = dot(viewDir, reflectDir);
-                        if (specularFactor > 0) {
-                            specularFactor = pow(specularFactor, world.shininess);
-                            vec3 specular = light.intensity * world.specularColor * specularFactor;
-                            pixelColor += specular;
-                        }                       
-                    }
-                }
+                //         // Calculate specular contribution using the Phong equation
+                //         double specularFactor = dot(viewDir, reflectDir);
+                //         if (specularFactor > 0) {
+                //             specularFactor = pow(specularFactor, world.shininess);
+                //             vec3 specular = light.intensity * world.specularColor * specularFactor;
+                //             pixelColor += specular;
+                //         }                       
+                //     }
+                // }
                         
                 // Ensure final pixel color is within the valid range [0, 1]
-                pixelColor = clamp(pixelColor, 0.0, 1.0);
+                clamp(pixelColor, 0.0, 1.0);
                 return color(pixelColor);
             }
             return world.backgroundcolor; // If no object hit, return background color
-            }
+        }
         return color(0,0,0);
     }
 };
+
+void clamp(vec3& color, double min, double max) {
+    if (color.x < min) { color.x = min; }
+    if (color.y < min) { color.y = min; }
+    if (color.z < min) { color.z = min; }
+    if (color.x > max) { color.x = max; }  
+    if (color.y > max) { color.y = max; }
+    if (color.z > max) { color.z = max; }
+}
 
 #endif
 

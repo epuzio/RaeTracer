@@ -7,7 +7,7 @@
 
 class triangle : public shape {
   public:
-    triangle(point3 v0, point3 v1, point3 v2) : v0(v0), v1(v1), v2(v2) {}
+    triangle(point3 v0, point3 v1, point3 v2, material bp) : v0(v0), v1(v1), v2(v2), bp(bp) {}
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
         //Using Möller-Trumbore algorithm:
@@ -50,7 +50,7 @@ class triangle : public shape {
     point3 v0;
     point3 v1;
     point3 v2;
-    shared_ptr<material> materialPtr;
+    material bp;
 };
 
 #endif

@@ -6,6 +6,7 @@
 #include "sphere.h"
 #include "triangle.h"  
 #include "cylinder.h"
+#include "material.h"
 
 #include "interval.h"
 #include "vec3.h"
@@ -14,7 +15,6 @@
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <fstream>
-using namespace std;
 using json = nlohmann::json;
 using point3 = vec3;
 
@@ -47,9 +47,9 @@ void setCameraParameters(camera& cam, json input){
         );
 }
 
-shared_ptr<material> setMaterialParameters(scene&world, json s){
+material setMaterialParameters(scene&world, json s){
     json materialInput = s["material"];
-    shared_ptr<material> mat(
+    return material(
         materialInput["ks"].get<double>(),
         materialInput["kd"].get<double>(),
         materialInput["specularexponent"].get<double>(),
@@ -68,7 +68,6 @@ shared_ptr<material> setMaterialParameters(scene&world, json s){
         materialInput["isrefractive"].get<bool>(),
         materialInput["refractiveindex"].get<double>()
     );
-    return mat;
 }
 
 void setWorldParameters(scene& world, json input){
@@ -81,7 +80,7 @@ void setWorldParameters(scene& world, json input){
 
     //Push shapes from JSON input: (and materials (to-do))
     for (const auto& s : shapesInput) {
-        shared_ptr<material> mat = setMaterialParameters(world, s);
+        material mat = setMaterialParameters(world, s);
         if (s["type"] == "sphere"){
             world.add(make_shared<sphere>(
                 point3(
@@ -89,7 +88,8 @@ void setWorldParameters(scene& world, json input){
                     s["center"][1].get<double>(),
                     s["center"][2].get<double>()
                 ),
-                s["radius"].get<double>()
+                s["radius"].get<double>(),
+                mat
             ));
         }
         if (s["type"] == "triangle"){
@@ -108,7 +108,8 @@ void setWorldParameters(scene& world, json input){
                     s["v2"][0].get<double>(),
                     s["v2"][1].get<double>(),
                     s["v2"][2].get<double>()
-                )
+                ),
+                mat
             ));
         }
         if (s["type"] == "cylinder"){
@@ -124,7 +125,8 @@ void setWorldParameters(scene& world, json input){
                     s["axis"][2].get<double>()
                 ),
                 s["radius"].get<double>(),
-                s["height"].get<double>()
+                s["height"].get<double>(),
+                mat
             ));
         }
     }

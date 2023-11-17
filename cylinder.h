@@ -8,8 +8,8 @@
 class cylinder : public shape {
   public:
     cylinder(){}
-    cylinder(point3 center, vec3 axis, double radius, double height)
-        : center(center), axis(axis), radius(radius), height(height) {}
+    cylinder(point3 center, vec3 axis, double radius, double height, material bp)
+        : center(center), axis(axis), radius(radius), height(height), bp(bp){}
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override{
         vec3 oc = r.origin() - center;
@@ -45,7 +45,7 @@ class cylinder : public shape {
     vec3 axis; //line where the cylinder lies
     double radius;
     double height;
-    shared_ptr<material> materialPtr;
+    material bp;
 };
 
 #endif
