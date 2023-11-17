@@ -65,8 +65,9 @@ class camera {
         vec3 verticalStep = vertical / height;
 
         // Calculate location of upper left pixel (starting pixel)
-        vec3 topLeftPixel = (cameraPosition - (forward * (cameraPosition - lookAt)) - (horizontal/2) - (vertical/2)) + (.5*(horizontalStep + verticalStep));
-        
+        vec3 topLeftPixel = (cameraPosition + (forward * (cameraPosition - lookAt).length()) - (horizontal/2) - (vertical/2)) + (.5*(horizontalStep + verticalStep));
+        cout << "top left pix: " << topLeftPixel << endl;   
+
         //RENDER LOOP
         clock_t c = clock();
         for (int y = 0; y < height; ++y) {
@@ -75,13 +76,12 @@ class camera {
             for (int x = 0; x < width; ++x) {
                 vec3 pixelColor(0.0, 0.0, 0.0); //modified from color pixelColor = (0,0,0)
                 for (int s = 0; s < numSamples; ++s) {
-                    vec3 rayDirection = normalize(topLeftPixel + (x * horizontalStep) - (y * verticalStep) - cameraPosition);
-
+                    vec3 rayDirection = (topLeftPixel + (x * horizontalStep) - (y * verticalStep) - cameraPosition);
                     // double jitterpx = (rand() / (RAND_MAX)) - 0.5; //x offset for anti-aliasing
                     // double jitterpy = (rand() / (RAND_MAX)) - 0.5; //y offset for anti-aliasing
                     // vec3 rayDirection = pixelCenter - (jitterpx * horizontalStep * .5) + (jitterpy * verticalStep * .5);
-                    ray r(cameraPosition, rayDirection);
-                    if(x == y){cout << r.origin() << "    " << r.direction() << endl;}
+                    ray r(cameraPosition, rayDirection); //ray r normalizes direction
+                    // if(x == y){cout << r.origin() << "    " << r.direction() << " " << r.direction().length() << endl;}
                     pixelColor += rayColor(r, world);
                 }
                 writeColor(outputFile, pixelColor, numSamples);

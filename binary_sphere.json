@@ -13,12 +13,12 @@
         },
     "scene":
         { 
-            "backgroundcolor": [0.05, 0.45, 0.25], 
+            "backgroundcolor": [0.25, 0.25, 0.27], 
             "shapes":[ 
                 { 
                     "type":"sphere", 
-                    "center": [0.2, 0.4, 0.4],
-                    "radius":3.0
+                    "center": [-0.3, 0.19, 1],
+                    "radius":0.2
                 }
             ] 
         } 
