@@ -31,6 +31,7 @@ class sphere : public shape {
   private:
     point3 center;
     double radius;
+    shared_ptr<material> materialPtr;
 };
 
 #endif

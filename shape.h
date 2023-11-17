@@ -9,7 +9,7 @@ class hit_record {
   public:
     point3 p;
     vec3 normal;
-    // shared_ptr<material> materialPtr;
+    shared_ptr<material> materialPtr;
     double t;
     bool front_face;
 

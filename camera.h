@@ -17,7 +17,6 @@
 using namespace std;
 std::ofstream outputFile("img.ppm"); //move this somewhere better
 
-
 class camera {
   public:
     //world from JSON input:
@@ -34,7 +33,7 @@ class camera {
     double exposure;
     
     //not from JSON input:
-    int numSamples = 3; //to prevent aliasing
+    int numSamples = 2; //to prevent aliasing
     vec3 right, up, forward; //basis vectors for camera cameraPosition
 
     camera() {}
@@ -99,13 +98,45 @@ class camera {
                 return color(1, 0, 0);
             }
         } 
+
         if(rendermode == "phong"){
-            if(world.hit(r, interval(0, infinity), rec)) { //copilot autofill
-                //rec stores the normal of the object that got hit btw
-                cout << "phong shader should be called/implimented here" << endl;
+            if (world.hit(r, interval(0, infinity), rec)) {
+                vec3 normal = normalize(rec.normal);
+                vec3 surfaceColor = world.colorAt(rec); // Get surface color from the object hit
+                
+                vec3 ambient = world.ambientColor * surfaceColor; // Ambient reflection
+                
+                vec3 pixelColor = ambient; // Initialize with ambient light
+                        
+                        // Iterate through each light source in the scene
+                for (const auto& light : world.lights) {
+                    vec3 lightDir = unit_vector(light.position - rec.p);
+                    double diffuseFactor = dot(normal, lightDir); // Diffuse reflection
+                    
+                    if (diffuseFactor > 0) {
+                            // Calculate diffuse contribution
+                        vec3 diffuse = light.intensity * surfaceColor * diffuseFactor;
+                        pixelColor += diffuse;
+                        
+                        vec3 viewDir = unit_vector(cameraPosition - rec.p);
+                        vec3 reflectDir = reflect(-lightDir, normal); // Calculate reflection direction
+                        
+                        // Calculate specular contribution using the Phong equation
+                        double specularFactor = dot(viewDir, reflectDir);
+                        if (specularFactor > 0) {
+                            specularFactor = pow(specularFactor, world.shininess);
+                            vec3 specular = light.intensity * world.specularColor * specularFactor;
+                            pixelColor += specular;
+                        }                       
+                    }
+                }
+                        
+                // Ensure final pixel color is within the valid range [0, 1]
+                pixelColor = clamp(pixelColor, 0.0, 1.0);
+                return color(pixelColor);
             }
-            return world.backgroundcolor; //if no object hit, return background color
-        }
+            return world.backgroundcolor; // If no object hit, return background color
+            }
         return color(0,0,0);
     }
 };
@@ -145,3 +176,46 @@ class camera {
 //         }
 //         clog << "\rDone in " << (clock() - c) / CLOCKS_PER_SEC << " ms.       \n";
 //     }
+
+
+
+
+
+// //original gpt code for phong
+// if (world.hit(r, interval(0, infinity), rec)) {
+//                 vec3 normal = unit_vector(rec.normal); // Ensure the normal is unit length
+//                 vec3 surfaceColor = world.colorAt(rec); // Get surface color from the object hit
+                
+//                 vec3 ambient = world.ambientColor * surfaceColor; // Ambient reflection
+                
+//                 vec3 pixelColor = ambient; // Initialize with ambient light
+                        
+//                         // Iterate through each light source in the scene
+//                 for (const auto& light : world.lights) {
+//                     vec3 lightDir = unit_vector(light.position - rec.p);
+//                     double diffuseFactor = dot(normal, lightDir); // Diffuse reflection
+                    
+//                     if (diffuseFactor > 0) {
+//                             // Calculate diffuse contribution
+//                         vec3 diffuse = light.intensity * surfaceColor * diffuseFactor;
+//                         pixelColor += diffuse;
+                        
+//                         vec3 viewDir = unit_vector(cameraPosition - rec.p);
+//                         vec3 reflectDir = reflect(-lightDir, normal); // Calculate reflection direction
+                        
+//                         // Calculate specular contribution using the Phong equation
+//                         double specularFactor = dot(viewDir, reflectDir);
+//                         if (specularFactor > 0) {
+//                             specularFactor = pow(specularFactor, world.shininess);
+//                             vec3 specular = light.intensity * world.specularColor * specularFactor;
+//                             pixelColor += specular;
+//                         }                       
+//                     }
+//                 }
+                        
+//                 // Ensure final pixel color is within the valid range [0, 1]
+//                 pixelColor = clamp(pixelColor, 0.0, 1.0);
+//                 return color(pixelColor);
+//             }
+//             return world.backgroundcolor; // If no object hit, return background color
+//             }

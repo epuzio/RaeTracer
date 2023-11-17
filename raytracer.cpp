@@ -47,6 +47,30 @@ void setCameraParameters(camera& cam, json input){
         );
 }
 
+shared_ptr<material> setMaterialParameters(scene&world, json s){
+    json materialInput = s["material"];
+    shared_ptr<material> mat(
+        materialInput["ks"].get<double>(),
+        materialInput["kd"].get<double>(),
+        materialInput["specularexponent"].get<double>(),
+        color(
+            materialInput["diffusecolor"][0].get<double>(),
+            materialInput["diffusecolor"][1].get<double>(),
+            materialInput["diffusecolor"][2].get<double>()
+        ),
+        color(
+            materialInput["specularcolor"][0].get<double>(),
+            materialInput["specularcolor"][1].get<double>(),
+            materialInput["specularcolor"][2].get<double>()
+        ),
+        materialInput["isreflective"].get<bool>(),
+        materialInput["reflectivity"].get<double>(),
+        materialInput["isrefractive"].get<bool>(),
+        materialInput["refractiveindex"].get<double>()
+    );
+    return mat;
+}
+
 void setWorldParameters(scene& world, json input){
     json sceneInput = input["scene"];
     json backgroundInput = sceneInput["backgroundcolor"];
@@ -57,6 +81,7 @@ void setWorldParameters(scene& world, json input){
 
     //Push shapes from JSON input: (and materials (to-do))
     for (const auto& s : shapesInput) {
+        shared_ptr<material> mat = setMaterialParameters(world, s);
         if (s["type"] == "sphere"){
             world.add(make_shared<sphere>(
                 point3(
@@ -110,7 +135,7 @@ int main() {
     camera cam;
 
     //JSON input
-    ifstream inputFile("binary_primitives.json");
+    ifstream inputFile("binary_debug.json");
     json input;
 
     if (inputFile.is_open()) {

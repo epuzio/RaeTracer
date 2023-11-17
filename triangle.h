@@ -50,6 +50,7 @@ class triangle : public shape {
     point3 v0;
     point3 v1;
     point3 v2;
+    shared_ptr<material> materialPtr;
 };
 
 #endif

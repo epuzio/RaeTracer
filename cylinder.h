@@ -45,6 +45,7 @@ class cylinder : public shape {
     vec3 axis; //line where the cylinder lies
     double radius;
     double height;
+    shared_ptr<material> materialPtr;
 };
 
 #endif
