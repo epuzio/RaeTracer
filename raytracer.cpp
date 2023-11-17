@@ -110,7 +110,7 @@ int main() {
     camera cam;
 
     //JSON input
-    ifstream inputFile("binary_debug.json");
+    ifstream inputFile("scene.json");
     json input;
 
     if (inputFile.is_open()) {

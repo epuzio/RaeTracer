@@ -10,45 +10,36 @@ class cylinder : public shape {
     cylinder(){}
     cylinder(point3 center, vec3 axis, double radius, double height)
         : center(center), axis(axis), radius(radius), height(height) {}
-        bool hit(const ray& r, interval ray_t, hit_record& rec) const override{
-        // Ray parameters
-        vec3 P = r.origin();
-        vec3 V = r.direction();
 
-        // Solve for the intersection using quadratic equation coefficients
-        float a = V.x * V.x + V.z * V.z;
-        float b = 2.0 * (P.x * V.x + P.z * V.z - center.x * V.x - center.z * V.z);
-        float c = P.x * P.x + P.z * P.z - center.x * center.x - center.z * center.z - radius * radius;
-
-        // Solve quadratic equation: at^2 + bt + c = 0
-        float discriminant = b * b - (4 * (a * c));
-        if(fabs(discriminant) < 0.0001){ return false;}
-
-        // Check if the ray intersects the cylinder
-        if (discriminant >= 0) {
-            float t1 = (-b - sqrt(discriminant)) / (2.0 * a);
-            float t2 = (-b + sqrt(discriminant)) / (2.0 * a);
-
-            // Check if the intersection is within the ray's interval
-            if (t1 > ray_t.max || t2 < ray_t.min) {
-                return false;
-            }
-
-            // Determine the closest intersection point
-            float t = (t1 > ray_t.min) ? t1 : t2;
-
-            // Compute the intersection point
-            vec3 intersection_point = P + (t * V);
-
-            // Set the hit record information (come back to later)
-            rec.t = t;
-            rec.p = intersection_point;
-            rec.normal = (intersection_point - center) / radius;
-
-            return true; // Intersection found
+    bool hit(const ray& r, interval ray_t, hit_record& rec) const override{
+        vec3 oc = r.origin() - center;
+        double a = dot(r.direction(), r.direction()) - dot(r.direction(), axis)*dot(r.direction(), axis);
+        double b = 2.0*(dot(r.direction(), oc) - dot(r.direction(), axis)*dot(oc, axis));
+        double c = dot(oc, oc) - dot(oc, axis)*dot(oc, axis) - radius*radius;
+        double discriminant = b*b - 4*a*c;
+        if (discriminant < 0){
+            return false;
         }
-        return false; // No intersection
-      }
+
+        double t = (-b - sqrt(discriminant)) / (2.0*a);
+        if (t < ray_t.min || t > ray_t.max){
+            return false;
+        }
+
+        point3 p = r.at(t);
+        double projection = dot(p - center, axis);
+
+        // Check if the intersection point is within the height of the cylinder
+        if (projection < 0 || projection > height*2) {
+            return false;
+        }
+        
+        vec3 outward_normal = (p - center - dot(p - center, axis)*axis) / radius;
+        rec.set_face_normal(r, outward_normal);
+        rec.t = t;
+        rec.p = p;
+        return true;
+    }
   private:
     point3 center; //center of the cylinder
     vec3 axis; //line where the cylinder lies
@@ -57,3 +48,30 @@ class cylinder : public shape {
 };
 
 #endif
+
+
+
+
+
+
+
+
+
+// //original copilot code:
+// bool hit(const ray& r, interval ray_t, hit_record& rec) const override{
+//             vec3 oc = r.origin() - center;
+//             double a = dot(r.direction(), r.direction()) - dot(r.direction(), axis)*dot(r.direction(), axis);
+//             double b = 2.0*(dot(r.direction(), oc) - dot(r.direction(), axis)*dot(oc, axis));
+//             double c = dot(oc, oc) - dot(oc, axis)*dot(oc, axis) - radius*radius;
+//             double discriminant = b*b - 4*a*c;
+//             if (discriminant < 0) return false;
+//             double t = (-b - sqrt(discriminant)) / (2.0*a);
+//             if (t < ray_t.min() || t > ray_t.max()) return false;
+//             point3 p = r.at(t);
+//             if (p.y() < center.y() || p.y() > center.y() + height) return false;
+//             vec3 outward_normal = (p - center - dot(p - center, axis)*axis) / radius;
+//             rec.set_face_normal(r, outward_normal);
+//             rec.t = t;
+//             rec.p = p;
+//             return true;
+//         }

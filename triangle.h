@@ -42,7 +42,7 @@ class triangle : public shape {
             return false;
         }
 
-        rec.p = r.at(t);
+        rec.p = r.at(t); //not setting normals.... fix later w/ phong
         return true; // Ray intersects the triangle
     }
 
