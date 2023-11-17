@@ -34,7 +34,7 @@ class camera {
     double exposure;
     
     //not from JSON input:
-    int numSamples = 1; //to prevent aliasing
+    int numSamples = 3; //to prevent aliasing
     vec3 right, up, forward; //basis vectors for camera cameraPosition
 
     camera() {}
@@ -69,12 +69,15 @@ class camera {
         //RENDER LOOP
         clock_t c = clock();
         for (int y = 0; y < height; ++y) {
-            // clog << "\r[" << static_cast<int>((100.00*(y + 1) / height)) << "] percent complete" << flush;
+            clog << "\r[" << static_cast<int>((100.00*(y + 1) / height)) << "] percent complete" << flush;
             // calculate pixel color //copilot
             for (int x = 0; x < width; ++x) {
                 vec3 pixelColor(0.0, 0.0, 0.0); //modified from color pixelColor = (0,0,0)
                 for (int s = 0; s < numSamples; ++s) {
-                    vec3 rayDirection = (topLeftPixel + (x * horizontalStep) + (y * verticalStep) - cameraPosition);
+                    double jitterpx = (rand() / (RAND_MAX)) - 0.5; //x offset for anti-aliasing
+                    double jitterpy = (rand() / (RAND_MAX)) - 0.5; //y offset for anti-aliasing
+                    vec3 pixelCenter = (topLeftPixel + (x * horizontalStep) + (y * verticalStep) - cameraPosition);
+                    vec3 rayDirection = pixelCenter - (jitterpx * horizontalStep * .5) + (jitterpy * verticalStep * .5);
                     ray r(cameraPosition, rayDirection); //ray r normalizes direction
                     pixelColor += rayColor(r, world);
                 }
@@ -108,6 +111,8 @@ class camera {
 };
 
 #endif
+
+
 
 
 
