@@ -17,7 +17,7 @@
             "shapes":[ 
                 { 
                     "type":"sphere", 
-                    "center": [-0.3, 0.19, 1],
+                    "center": [-0.3, 0.19, 2],
                     "radius":0.2
                 }
             ] 

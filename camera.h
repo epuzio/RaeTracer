@@ -57,8 +57,8 @@ class camera {
         double viewportWidth = aspectRatio * viewportHeight;
 
         //Calculate the vectors across the horizontal and vertical axes of the viewport //c
-        vec3 horizontal = viewportWidth * right;
-        vec3 vertical = viewportHeight * up;
+        vec3 horizontal = viewportWidth * -right;
+        vec3 vertical = viewportHeight * -up;
 
         //Calculate the horizontal and vertical vectors pointing to the next pixel //c
         vec3 horizontalStep = horizontal / width;
@@ -66,22 +66,21 @@ class camera {
 
         // Calculate location of upper left pixel (starting pixel)
         vec3 topLeftPixel = (cameraPosition + (forward * (cameraPosition - lookAt).length()) - (horizontal/2) - (vertical/2)) + (.5*(horizontalStep + verticalStep));
-        cout << "top left pix: " << topLeftPixel << endl;   
-
+        cout << topLeftPixel << endl;
         //RENDER LOOP
         clock_t c = clock();
         for (int y = 0; y < height; ++y) {
-            clog << "\r[" << static_cast<int>((100.00*(y + 1) / height)) << "] percent complete" << flush;
+            // clog << "\r[" << static_cast<int>((100.00*(y + 1) / height)) << "] percent complete" << flush;
             // calculate pixel color //copilot
             for (int x = 0; x < width; ++x) {
                 vec3 pixelColor(0.0, 0.0, 0.0); //modified from color pixelColor = (0,0,0)
                 for (int s = 0; s < numSamples; ++s) {
-                    vec3 rayDirection = (topLeftPixel + (x * horizontalStep) - (y * verticalStep) - cameraPosition);
-                    // double jitterpx = (rand() / (RAND_MAX)) - 0.5; //x offset for anti-aliasing
-                    // double jitterpy = (rand() / (RAND_MAX)) - 0.5; //y offset for anti-aliasing
-                    // vec3 rayDirection = pixelCenter - (jitterpx * horizontalStep * .5) + (jitterpy * verticalStep * .5);
+                    vec3 rayDirection = (topLeftPixel + (x * horizontalStep) + (y * verticalStep) - cameraPosition);
                     ray r(cameraPosition, rayDirection); //ray r normalizes direction
-                    // if(x == y){cout << r.origin() << "    " << r.direction() << " " << r.direction().length() << endl;}
+                    if(x==0 && y == 0){cout << "ray direction x=0, y=0: " << rayDirection << endl;}
+                    if(x==width-1 && y == 0){cout << "ray direction x=w-1, y=0: " << rayDirection << endl;}
+                    if(x==0 && y == height-1){cout << "ray direction x=0, y=h-1: " << rayDirection << endl;}
+                    if(x==width-1 && y == height-1){cout << "ray direction x=w-1, y=h-1: " << rayDirection << endl;}
                     pixelColor += rayColor(r, world);
                 }
                 writeColor(outputFile, pixelColor, numSamples);
