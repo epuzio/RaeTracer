@@ -65,8 +65,8 @@ class camera {
         vec3 verticalStep = vertical / height;
 
         // Calculate location of upper left pixel (starting pixel)
-        vec3 topLeftPixel = (cameraPosition - (horizontal/2) - (vertical/2)) + (.5*(horizontalStep + verticalStep));
-
+        vec3 topLeftPixel = (cameraPosition - (forward * (cameraPosition - lookAt)) - (horizontal/2) - (vertical/2)) + (.5*(horizontalStep + verticalStep));
+        
         //RENDER LOOP
         clock_t c = clock();
         for (int y = 0; y < height; ++y) {
