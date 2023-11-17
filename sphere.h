@@ -10,18 +10,25 @@ class sphere : public shape {
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
       vec3 oc = r.origin() - center;
-      double a = dot(r.direction(), r.direction());
-      double b = 2.0 * dot(oc, r.direction());
-      double c = dot(oc, oc) - (radius * radius);
-      double discriminant = b * b - 4 * a * c;
+      auto a = r.direction().length_squared();
+      auto half_b = dot(oc, r.direction());
+      auto c = oc.length_squared() - radius * radius;
+      auto discriminant = half_b * half_b - a * c;
 
-      if (discriminant < 0) {
-          // No intersection
-          return false;
-      } else {
-          // Ray intersects the sphere
-          return true;
+      if (discriminant > 0) {
+          auto root = sqrt(discriminant);
+          auto temp = (-half_b - root) / a;
+          if (temp < ray_t.max && temp > ray_t.min) {
+              rec.t = temp;
+              rec.p = r.at(rec.t);
+              rec.normal = (rec.p - center) / radius;
+              cout << "hit :~)" << endl;
+              // Additional data assignment to hit_record
+              // e.g., material, texture, etc.
+              return true;
+          }
       }
+      return false;
     }
 
   private:
@@ -30,23 +37,3 @@ class sphere : public shape {
 };
 
 #endif
-
-
-
-
-
-
-// //original gpt code:
-// vec3 oc = ray.originPoint - sphere.center;
-//       double a = dot(ray.rayDirection, ray.rayDirection);
-//       double b = 2.0 * dot(oc, ray.rayDirection);
-//       double c = dot(oc, oc) - (sphere.radius * sphere.radius);
-//       double discriminant = b * b - 4 * a * c;
-
-//       if (discriminant < 0) {
-//           // No intersection
-//           return false;
-//       } else {
-//           // Ray intersects the sphere
-//           return true;
-//       }

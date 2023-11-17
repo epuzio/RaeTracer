@@ -11,9 +11,12 @@
 #include <vector>
 #include <ctime>
 #include <cmath>
+#include <fstream>
 #include <cstdlib>
 
 using namespace std;
+std::ofstream outputFile("img.ppm"); //move this somewhere better
+
 
 class camera {
   public:
@@ -31,7 +34,7 @@ class camera {
     double exposure;
     
     //not from JSON input:
-    int numSamples = 3; //to prevent aliasing
+    int numSamples = 1; //to prevent aliasing
     vec3 right, up, forward; //basis vectors for camera cameraPosition
 
     camera() {}
@@ -44,10 +47,13 @@ class camera {
     }
    
    void render(const scene& world) const {
+        outputFile << "P3\n" << width << ' ' << height << "\n255\n"; 
         vec3 rays;
+
         // Calculate viewport dimensions //copilot
         double aspectRatio = static_cast<double>(width) / height;
-        double viewportHeight = tan(fov * 0.5 * M_PI / 180.0) * 2.0;
+        double fovRadians = (fov * M_PI) / 180.0;
+        double viewportHeight = 2.0 * tan(fovRadians/2);
         double viewportWidth = aspectRatio * viewportHeight;
 
         //Calculate the vectors across the horizontal and vertical axes of the viewport //c
@@ -64,19 +70,21 @@ class camera {
         //RENDER LOOP
         clock_t c = clock();
         for (int y = 0; y < height; ++y) {
-            clog << "\r[" << (height - y) / y << "]'%' of lines complete" << flush;
+            clog << "\r[" << static_cast<int>((100.00*(y + 1) / height)) << "] percent complete" << flush;
             // calculate pixel color //copilot
             for (int x = 0; x < width; ++x) {
                 vec3 pixelColor(0.0, 0.0, 0.0); //modified from color pixelColor = (0,0,0)
                 for (int s = 0; s < numSamples; ++s) {
-                    vec3 pixelCenter = topLeftPixel + (x * horizontalStep) + (y * verticalStep);
-                    double jitterpx = (rand() / (RAND_MAX)) - 0.5; //x offset for anti-aliasing
-                    double jitterpy = (rand() / (RAND_MAX)) - 0.5; //y offset for anti-aliasing
-                    vec3 rayDirection = pixelCenter - (jitterpx * horizontalStep * .5) + (jitterpy * verticalStep * .5);
+                    vec3 rayDirection = normalize(topLeftPixel + (x * horizontalStep) - (y * verticalStep) - cameraPosition);
+
+                    // double jitterpx = (rand() / (RAND_MAX)) - 0.5; //x offset for anti-aliasing
+                    // double jitterpy = (rand() / (RAND_MAX)) - 0.5; //y offset for anti-aliasing
+                    // vec3 rayDirection = pixelCenter - (jitterpx * horizontalStep * .5) + (jitterpy * verticalStep * .5);
                     ray r(cameraPosition, rayDirection);
+                    if(x == y){cout << r.origin() << "    " << r.direction() << endl;}
                     pixelColor += rayColor(r, world);
                 }
-                writeColor(cout, pixelColor, numSamples); //todo: write to image file
+                writeColor(outputFile, pixelColor, numSamples);
             }
         }
         clog << "\rDone in " << (clock() - c) / CLOCKS_PER_SEC << " ms.       \n";
@@ -92,60 +100,17 @@ class camera {
         hit_record rec;
         if(world.hit(r, interval(0, infinity), rec)) { //copilot autofill
         //rec is now eqivalent to closest object hit by ray btw
+
             if(rendermode == "binary"){
-                return color(255, 0, 0);
+                return color(1, 0, 0);
             } 
             else if (rendermode == "phong"){
-                cout << "Phong!" << endl;
-                // return phongShade(r, rec);
+                //rec stores the normal of the object that got hit btw
+                cout << "phong shader should be called/implimented here" << endl;
             }
         }
-        return color(0,0,0); //if no object hit, return background color
+        return world.backgroundcolor; //if no object hit, return background color
     }
-
-    // vec3 phongShade(const ray& ray, const scene& world) {
-    //     vec3 ambientColor = {0.1f, 0.1f, 0.1f}; // Ambient light color
-    //     vec3 lightDirection = {-1.0f, 1.0f, -1.0f}; // Example light direction
-
-    //     vec3 finalColor = {0.0f, 0.0f, 0.0f};
-
-    //     Object closestObject;
-    //     if (scene.hit(ray, closestObject)) {
-    //         vec3 normal = {...}; // Calculate surface normal at the intersection point
-
-    //         // Ambient light contribution
-    //         vec3 ambientContribution = {
-    //             ambientColor.x * closestObject.material.ambientColor.x,
-    //             ambientColor.y * closestObject.material.ambientColor.y,
-    //             ambientColor.z * closestObject.material.ambientColor.z
-    //         };
-
-    //         // Diffuse light contribution
-    //         float cosTheta = std::max(0.0f, normal.x * lightDirection.x + normal.y * lightDirection.y + normal.z * lightDirection.z);
-    //         vec3 diffuseContribution = {
-    //             cosTheta * closestObject.material.diffuseColor.x,
-    //             cosTheta * closestObject.material.diffuseColor.y,
-    //             cosTheta * closestObject.material.diffuseColor.z
-    //         };
-
-    //         // Specular light contribution
-    //         vec3 viewDirection = {...}; // Calculate view direction
-    //         vec3 reflectionDirection = {...}; // Calculate reflection direction
-    //         float cosAlpha = std::max(0.0f, reflectionDirection.x * lightDirection.x + reflectionDirection.y * lightDirection.y + reflectionDirection.z * lightDirection.z);
-    //         float specularIntensity = pow(cosAlpha, closestObject.material.shininess);
-    //         vec3 specularContribution = {
-    //             specularIntensity * closestObject.material.specularColor.x,
-    //             specularIntensity * closestObject.material.specularColor.y,
-    //             specularIntensity * closestObject.material.specularColor.z
-    //         };
-
-    //         // Final color calculation
-    //         finalColor.x = ambientContribution.x + diffuseContribution.x + specularContribution.x;
-    //         finalColor.y = ambientContribution.y + diffuseContribution.y + specularContribution.y;
-    //         finalColor.z = ambientContribution.z + diffuseContribution.z + specularContribution.z;
-    //     }
-    // return finalColor;
-    // }
 };
 
 #endif

@@ -7,6 +7,9 @@
 typedef vec3 color;
 using namespace std;
 
+//Write pixel color to output file
+
+
 void writeColor(ostream &out, color pixel_color, int numSamples) {
     pixel_color /= numSamples; //average color
     out << static_cast<int>(256 * pixel_color.x) << ' '

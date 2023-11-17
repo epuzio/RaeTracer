@@ -57,7 +57,7 @@ void setWorldParameters(scene& world, json input){
 
     //Push shapes from JSON input: (and materials (to-do))
     for (const auto& s : shapesInput) {
-        if (s["type"] == "Sphere"){
+        if (s["type"] == "sphere"){
             world.add(make_shared<sphere>(
                 point3(
                     s["center"][0].get<double>(),
@@ -67,7 +67,7 @@ void setWorldParameters(scene& world, json input){
                 s["radius"].get<double>()
             ));
         }
-        if (s["type"] == "Triangle"){
+        if (s["type"] == "triangle"){
             world.add(make_shared<triangle>(
                 vec3(
                     s["v0"][0].get<double>(),
@@ -86,7 +86,7 @@ void setWorldParameters(scene& world, json input){
                 )
             ));
         }
-        if (s["type"] == "Cylinder"){
+        if (s["type"] == "cylinder"){
             world.add(make_shared<cylinder>(
                 point3(
                     s["center"][0].get<double>(),
@@ -127,6 +127,7 @@ int main() {
     } else {
         cerr << "Unable to open json file." << endl;
     }
+    cout << world.objects.size() << endl;
     cam.render(world);
 };
 
