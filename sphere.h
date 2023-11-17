@@ -22,9 +22,6 @@ class sphere : public shape {
               rec.t = temp;
               rec.p = r.at(rec.t);
               rec.normal = (rec.p - center) / radius;
-              cout << "hit :~)" << endl;
-              // Additional data assignment to hit_record
-              // e.g., material, texture, etc.
               return true;
           }
       }

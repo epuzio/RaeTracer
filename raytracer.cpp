@@ -110,7 +110,7 @@ int main() {
     camera cam;
 
     //JSON input
-    ifstream inputFile("binary_sphere.json");
+    ifstream inputFile("binary_debug.json");
     json input;
 
     if (inputFile.is_open()) {
@@ -127,7 +127,6 @@ int main() {
     } else {
         cerr << "Unable to open json file." << endl;
     }
-    cout << world.objects.size() << endl;
     cam.render(world);
 };
 

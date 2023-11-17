@@ -10,7 +10,7 @@ class cylinder : public shape {
     cylinder(){}
     cylinder(point3 center, vec3 axis, double radius, double height)
         : center(center), axis(axis), radius(radius), height(height) {}
-    bool hit(const ray& r, interval ray_t, hit_record& rec) const override{
+        bool hit(const ray& r, interval ray_t, hit_record& rec) const override{
         // Ray parameters
         vec3 P = r.origin();
         vec3 V = r.direction();
@@ -41,13 +41,12 @@ class cylinder : public shape {
             vec3 intersection_point = P + (t * V);
 
             // Set the hit record information (come back to later)
-            // rec.t = t;
-            // rec.point = intersection_point;
-            // rec.normal = (intersection_point - center) / radius;
+            rec.t = t;
+            rec.p = intersection_point;
+            rec.normal = (intersection_point - center) / radius;
 
             return true; // Intersection found
         }
-
         return false; // No intersection
       }
   private:

@@ -66,7 +66,6 @@ class camera {
 
         // Calculate location of upper left pixel (starting pixel)
         vec3 topLeftPixel = (cameraPosition + (forward * (cameraPosition - lookAt).length()) - (horizontal/2) - (vertical/2)) + (.5*(horizontalStep + verticalStep));
-        cout << topLeftPixel << endl;
         //RENDER LOOP
         clock_t c = clock();
         for (int y = 0; y < height; ++y) {
@@ -77,10 +76,6 @@ class camera {
                 for (int s = 0; s < numSamples; ++s) {
                     vec3 rayDirection = (topLeftPixel + (x * horizontalStep) + (y * verticalStep) - cameraPosition);
                     ray r(cameraPosition, rayDirection); //ray r normalizes direction
-                    if(x==0 && y == 0){cout << "ray direction x=0, y=0: " << rayDirection << endl;}
-                    if(x==width-1 && y == 0){cout << "ray direction x=w-1, y=0: " << rayDirection << endl;}
-                    if(x==0 && y == height-1){cout << "ray direction x=0, y=h-1: " << rayDirection << endl;}
-                    if(x==width-1 && y == height-1){cout << "ray direction x=w-1, y=h-1: " << rayDirection << endl;}
                     pixelColor += rayColor(r, world);
                 }
                 writeColor(outputFile, pixelColor, numSamples);
@@ -95,20 +90,20 @@ class camera {
         if (nbounces <= 0) {
             return color(0,0,0);
         }
-
         hit_record rec;
-        if(world.hit(r, interval(0, infinity), rec)) { //copilot autofill
-        //rec is now eqivalent to closest object hit by ray btw
-
-            if(rendermode == "binary"){
+        if(rendermode == "binary"){
+            if(world.hit(r, interval(0, infinity), rec)) { //copilot autofill
                 return color(1, 0, 0);
-            } 
-            else if (rendermode == "phong"){
+            }
+        } 
+        if(rendermode == "phong"){
+            if(world.hit(r, interval(0, infinity), rec)) { //copilot autofill
                 //rec stores the normal of the object that got hit btw
                 cout << "phong shader should be called/implimented here" << endl;
             }
+            return world.backgroundcolor; //if no object hit, return background color
         }
-        return world.backgroundcolor; //if no object hit, return background color
+        return color(0,0,0);
     }
 };
 
