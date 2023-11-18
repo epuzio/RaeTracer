@@ -41,7 +41,9 @@ class triangle : public shape {
         if (t < ray_t.min || t > ray_t.max) {
             return false;
         }
-        rec.t = t; //i don't know if this is correct
+        
+        rec.t = t;
+        rec.set_face_normal(r, normalize(cross(v1 - v0, v2 - v0)));
         rec.p = r.at(t);
         rec.bp = bp;
         return true; // Ray intersects the triangle

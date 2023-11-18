@@ -64,7 +64,7 @@ class camera {
         vec3 verticalStep = vertical / height;
 
         // Calculate location of upper left pixel (starting pixel)
-        vec3 topLeftPixel = (cameraPosition + (forward * (cameraPosition - lookAt).length()) - (horizontal/2) - (vertical/2)) + (.5*(horizontalStep + verticalStep));
+        vec3 topLeftPixel = cameraPosition + forward - (horizontal / 2) - (vertical / 2);
        
         //RENDER LOOP
         clock_t c = clock();
@@ -106,15 +106,27 @@ class camera {
             hit_record rec;
             if (world.hit(r, interval(0, infinity), rec)) {
                 //Ambient:
-                vec3 normal = normalize(rec.normal);
                 vec3 ambient = world.backgroundcolor * rec.bp->diffusecolor; // Ambient reflection
                 vec3 pixelColor = clamp(ambient, 0.0, 1.0); // Initialize with ambient light
                         
                 // Iterate through each light source in the scene
                 for (const auto& light : world.lights) {
+                    // //Shadow Calculation - don't calculate Diffuse or Specular if in shadow
+                    // if(rec.front_face) {
+                    //     vec3 shadowRayOrigin = rec.p + (0.001 * rec.normal); //bit of bias
+                    //     vec3 directionToLight = normalize(light->position - shadowRayOrigin);
+                    //     ray shadowRay(shadowRayOrigin, directionToLight);
+                    //     hit_record shadowRec;
+                    //     if (world.hit(shadowRay, interval(0, infinity), shadowRec)) {
+                    //         if(shadowRec.t < directionToLight.length()){
+                    //             continue;
+                    //         }
+                    //     }//
+                    // }
+                    
                     //Diffuse:
                     vec3 lightDir = normalize(light->position - rec.p);
-                    double diffuseFactor = dot(normal, lightDir); // Diffuse reflection
+                    double diffuseFactor = dot(rec.normal, lightDir); // Diffuse reflection
                     
                     if (diffuseFactor > 0) {
                         // Calculate diffuse contribution
@@ -122,7 +134,7 @@ class camera {
                         pixelColor += clamp(diffuse, 0.0, 1.0);
                         
                         vec3 viewDir = normalize(cameraPosition - rec.p);
-                        vec3 reflectDir = reflect(-lightDir, normal); // Calculate reflection direction
+                        vec3 reflectDir = reflect(-lightDir, rec.normal); // Calculate reflection direction
                         
                         // Calculate specular contribution using the Phong equation
                         double specularFactor = dot(viewDir, reflectDir);
@@ -223,3 +235,20 @@ class camera {
 //             }
 //             return world.backgroundcolor; // If no object hit, return background color
 //             }
+
+
+
+
+//original gpt code: (put in the sphere class)
+// bool isShadowed(const vec3& point, const std::vector<Sphere>& spheres, const vec3& lightPosition) {
+//     vec3 toLight = lightPosition - point;
+//     Ray shadowRay(point, toLight.normalize());
+
+//     for (const auto& sphere : spheres) {
+//         if (sphere.intersect(shadowRay)) {
+//             return true; // The point is in shadow
+//         }
+//     }
+
+//     return false; // No objects block the light to the point
+// }

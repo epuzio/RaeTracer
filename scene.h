@@ -48,3 +48,4 @@ class scene : public shape {
 };
 
 #endif
+
