@@ -118,7 +118,7 @@ class camera {
                     
                     if (diffuseFactor > 0) {
                         // Calculate diffuse contribution
-                        vec3 diffuse = light->intensity * rec.bp->diffusecolor * diffuseFactor;
+                        vec3 diffuse = light->intensity * rec.bp->diffusecolor * diffuseFactor * rec.bp->kd;
                         pixelColor += clamp(diffuse, 0.0, 1.0);
                         
                         vec3 viewDir = normalize(cameraPosition - rec.p);
@@ -128,7 +128,7 @@ class camera {
                         double specularFactor = dot(viewDir, reflectDir);
                         if (specularFactor > 0) {
                             specularFactor = pow(specularFactor, rec.bp->specularexponent);
-                            vec3 specular = light->intensity * rec.bp->specularcolor * specularFactor;
+                            vec3 specular = light->intensity * rec.bp->specularcolor * specularFactor * rec.bp->ks;
                             pixelColor += clamp(specular, 0.0, 1.0);
                         }                       
                     }
