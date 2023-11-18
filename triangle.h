@@ -46,6 +46,8 @@ class triangle : public shape {
         rec.set_face_normal(r, normalize(cross(v1 - v0, v2 - v0)));
         rec.p = r.at(t);
         rec.bp = bp;
+
+        // cout << "normal: " << rec.normal << "pos: " << rec.p << endl;
         return true; // Ray intersects the triangle
     }
 

@@ -111,18 +111,19 @@ class camera {
                         
                 // Iterate through each light source in the scene
                 for (const auto& light : world.lights) {
-                    // //Shadow Calculation - don't calculate Diffuse or Specular if in shadow
-                    // if(rec.front_face) {
-                    //     vec3 shadowRayOrigin = rec.p + (0.001 * rec.normal); //bit of bias
-                    //     vec3 directionToLight = normalize(light->position - shadowRayOrigin);
-                    //     ray shadowRay(shadowRayOrigin, directionToLight);
-                    //     hit_record shadowRec;
-                    //     if (world.hit(shadowRay, interval(0, infinity), shadowRec)) {
-                    //         if(shadowRec.t < directionToLight.length()){
-                    //             continue;
-                    //         }
-                    //     }//
-                    // }
+                    //Shadow Calculation - don't calculate Diffuse or Specular if in shadow
+                        vec3 shadowRayOrigin = rec.p + (0.001 * rec.normal); //bit of bias
+                        vec3 directionToLight = normalize(light->position - shadowRayOrigin);
+                        ray shadowRay(shadowRayOrigin, directionToLight);
+                        if(dot(rec.normal, directionToLight) < 0) {
+                            hit_record shadowRec;
+                            if (world.hit(shadowRay, interval(0, infinity), shadowRec)) {
+                                if(shadowRec.t < directionToLight.length()){
+                                    return color(.3, .1, .2);
+                                    continue;
+                                }
+                            }//
+                        }
                     
                     //Diffuse:
                     vec3 lightDir = normalize(light->position - rec.p);

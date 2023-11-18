@@ -42,7 +42,8 @@ class cylinder : public shape {
 
         // Check intersection with the cylindrical body
         if (projection >= -height && projection <= height) {
-            vec3 outward_normal = normalize(p - center - dot(p - center, axis) * axis);
+            vec3 diff = p - center - projection * axis;
+            vec3 outward_normal = normalize(diff - dot(diff, axis) * axis / (height * height));
             rec.set_face_normal(r, outward_normal);
             rec.t = t;
             rec.p = p;
@@ -70,14 +71,16 @@ class cylinder : public shape {
 
         point3 p = r.at(t);
         vec3 toCenter = p - capCenter;
-        double distanceSquared = toCenter.length_squared();
+        double distanceSquared = dot(toCenter, toCenter);
         if (distanceSquared <= radius * radius) {
-            vec3 outward_normal = isTopCap ? normalize(axis) : normalize(-axis);
+            vec3 outward_normal = normalize(isTopCap ? axis : -axis);
             rec.set_face_normal(r, outward_normal);
             rec.t = t;
             rec.p = p;
             rec.bp = bp;
-            return true;
+            if(dot(r.direction(), outward_normal) < 0){ //i added this line
+                return true;
+            }
         }
 
         return false;
