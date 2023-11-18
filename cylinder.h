@@ -30,18 +30,18 @@ class cylinder : public shape {
 
         // Check intersection with the bottom cap circle
         if (projection < 0) {
-            if (intersectBottomCap(r, ray_t, rec))
+            if (intersectCaps(r, ray_t, rec, false))
                 return true;
         }
 
         // Check intersection with the top cap circle
         if (projection > height) {
-            if (intersectTopCap(r, ray_t, rec))
+            if (intersectCaps(r, ray_t, rec, true))
                 return true;
         }
 
         // Check intersection with the cylindrical body
-        if (projection >= 0 && projection <= height) {
+        if (projection >= -height && projection <= height) {
             vec3 outward_normal = normalize(p - center - dot(p - center, axis) * axis);
             rec.set_face_normal(r, outward_normal);
             rec.t = t;
@@ -60,21 +60,19 @@ class cylinder : public shape {
     double height;
     shared_ptr<material> bp;
 
-    bool intersectBottomCap(const ray& r, interval ray_t, hit_record& rec) const {
-        // Create the bottom cap circle
-        vec3 normal = -axis;
-        point3 centerBottom = center - axis * height;
-        
-        // Calculate intersection with the circle
-        double t = dot((centerBottom - r.origin()), (normal)) / dot(r.direction(), (normal));
+    bool intersectCaps(const ray& r, interval ray_t, hit_record& rec, bool isTopCap) const {
+        vec3 normal = isTopCap ? axis : -axis;
+        point3 capCenter = isTopCap ? center + axis * height : center - axis * height;
+
+        double t = dot((capCenter - r.origin()), (normal)) / dot(r.direction(), (normal));
         if (t < ray_t.min || t > ray_t.max)
             return false;
 
         point3 p = r.at(t);
-        vec3 toCenter = p - centerBottom;
+        vec3 toCenter = p - capCenter;
         double distanceSquared = toCenter.length_squared();
         if (distanceSquared <= radius * radius) {
-            vec3 outward_normal = normalize(axis);
+            vec3 outward_normal = isTopCap ? normalize(axis) : normalize(-axis);
             rec.set_face_normal(r, outward_normal);
             rec.t = t;
             rec.p = p;
@@ -82,31 +80,6 @@ class cylinder : public shape {
             return true;
         }
 
-        return false;
-    }
-
-    // Helper function to check intersection with the top cap circle
-    bool intersectTopCap(const ray& r, interval ray_t, hit_record& rec) const {
-        // Create the top cap circle
-        vec3 normal = axis;
-        point3 centerTop = center + axis * height;
-
-        // Calculate intersection with the circle
-        double t = dot((centerTop - r.origin()), (normal)) / dot(r.direction(), (normal));
-        if (t < ray_t.min || t > ray_t.max)
-            return false;
-
-        point3 p = r.at(t);
-        vec3 toCenter = p - centerTop;
-        double distanceSquared = toCenter.length_squared();
-        if (distanceSquared <= radius * radius) {
-            vec3 outward_normal = normalize(axis);
-            rec.set_face_normal(r, outward_normal);
-            rec.t = t;
-            rec.p = p;
-            rec.bp = bp;
-            return true;
-        }
         return false;
     }
 };
