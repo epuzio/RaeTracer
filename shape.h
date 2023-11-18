@@ -4,12 +4,13 @@
 #include "ray.h"
 #include "interval.h"
 #include "material.h"
+#include <memory>
 
 class hit_record {
   public:
     point3 p;
     vec3 normal;
-    material bp;
+    shared_ptr<material> bp;
     double t;
     bool front_face;
 

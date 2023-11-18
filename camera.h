@@ -102,40 +102,41 @@ class camera {
         } 
 
         if(rendermode == "phong"){
+            hit_record rec;
             if (world.hit(r, interval(0, infinity), rec)) {
+                //Ambient:
                 vec3 normal = normalize(rec.normal);
-                //ambient light is diffuse color * .5 <- this is a hack
                 vec3 surfaceColor = rec.bp.diffusecolor*0.5; 
-                
+                cout << rec.bp.diffusecolor << endl;
                 vec3 ambient = world.backgroundcolor * surfaceColor; // Ambient reflection
-                
                 vec3 pixelColor = ambient; // Initialize with ambient light
                         
-                        // Iterate through each light source in the scene
+                // // Iterate through each light source in the scene
                 // for (const auto& light : world.lights) {
-                //     vec3 lightDir = normalize(light.position - rec.p);
+                //     //Diffuse:
+                //     vec3 lightDir = normalize(light->position - rec.p);
                 //     double diffuseFactor = dot(normal, lightDir); // Diffuse reflection
                     
                 //     if (diffuseFactor > 0) {
                 //             // Calculate diffuse contribution
-                //         vec3 diffuse = light.intensity * surfaceColor * diffuseFactor;
+                //         vec3 diffuse = light->intensity * surfaceColor * diffuseFactor;
                 //         pixelColor += diffuse;
                         
-                //         vec3 viewDir = unit_vector(cameraPosition - rec.p);
+                //         vec3 viewDir = normalize(cameraPosition - rec.p);
                 //         vec3 reflectDir = reflect(-lightDir, normal); // Calculate reflection direction
                         
                 //         // Calculate specular contribution using the Phong equation
                 //         double specularFactor = dot(viewDir, reflectDir);
                 //         if (specularFactor > 0) {
-                //             specularFactor = pow(specularFactor, world.shininess);
-                //             vec3 specular = light.intensity * world.specularColor * specularFactor;
+                //             specularFactor = pow(specularFactor, rec.bp.specularexponent);
+                //             vec3 specular = light->intensity * rec.bp.specularcolor * specularFactor;
                 //             pixelColor += specular;
                 //         }                       
                 //     }
                 // }
                         
                 // Ensure final pixel color is within the valid range [0, 1]
-                // pixelColor = clamp(pixelColor, 0.0, 1.0);
+                pixelColor = clamp(pixelColor, 0.0, 1.0);
                 return color(pixelColor);
             }
             return world.backgroundcolor; // If no object hit, return background color

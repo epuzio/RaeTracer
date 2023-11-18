@@ -3,6 +3,7 @@
 
 #include "shape.h"
 #include "light.h"
+#include "material.h"
 #include <memory>
 #include <vector>
 

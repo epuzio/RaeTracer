@@ -83,6 +83,19 @@ inline vec3 normalize(vec3 v) {
     return v;
 }
 
+inline vec3 reflect(const vec3& I, const vec3& N) { //added by copilot from "inline vec3 reflect"
+    return I - 2.0 * dot(N, I) * N;
+}
+
+inline vec3 clamp(vec3 v, double min, double max) {
+    if (v.x < min) { v.x = min; }
+    if (v.y < min) { v.y = min; }
+    if (v.z < min) { v.z = min; }
+    if (v.x > max) { v.x = max; }  
+    if (v.y > max) { v.y = max; }
+    if (v.z > max) { v.z = max; }
+    return v;
+}
 //add aliases for vec3 //copilot
 using point3 = vec3; // 3D point
 using color = vec3 ; // RGB color
