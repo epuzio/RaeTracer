@@ -90,8 +90,6 @@ material setMaterialParameters(scene&world, json s){
     );
 }
 
-
-
 void setWorldParameters(scene& world, json input){
     json sceneInput = input["scene"];
     json backgroundInput = sceneInput["backgroundcolor"];

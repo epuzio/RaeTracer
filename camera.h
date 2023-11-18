@@ -65,6 +65,7 @@ class camera {
 
         // Calculate location of upper left pixel (starting pixel)
         vec3 topLeftPixel = (cameraPosition + (forward * (cameraPosition - lookAt).length()) - (horizontal/2) - (vertical/2)) + (.5*(horizontalStep + verticalStep));
+       
         //RENDER LOOP
         clock_t c = clock();
         for (int y = 0; y < height; ++y) {
@@ -106,9 +107,8 @@ class camera {
             if (world.hit(r, interval(0, infinity), rec)) {
                 //Ambient:
                 vec3 normal = normalize(rec.normal);
-                vec3 surfaceColor = rec.bp->diffusecolor*0.5; 
-                vec3 ambient = world.backgroundcolor * surfaceColor; // Ambient reflection
-                vec3 pixelColor = ambient; // Initialize with ambient light
+                vec3 ambient = world.backgroundcolor * rec.bp->diffusecolor; // Ambient reflection
+                vec3 pixelColor = clamp(ambient, 0.0, 1.0); // Initialize with ambient light
                         
                 // Iterate through each light source in the scene
                 for (const auto& light : world.lights) {
@@ -117,9 +117,9 @@ class camera {
                     double diffuseFactor = dot(normal, lightDir); // Diffuse reflection
                     
                     if (diffuseFactor > 0) {
-                            // Calculate diffuse contribution
-                        vec3 diffuse = light->intensity * surfaceColor * diffuseFactor;
-                        pixelColor += diffuse;
+                        // Calculate diffuse contribution
+                        vec3 diffuse = light->intensity * rec.bp->diffusecolor * diffuseFactor;
+                        pixelColor += clamp(diffuse, 0.0, 1.0);
                         
                         vec3 viewDir = normalize(cameraPosition - rec.p);
                         vec3 reflectDir = reflect(-lightDir, normal); // Calculate reflection direction
@@ -129,7 +129,7 @@ class camera {
                         if (specularFactor > 0) {
                             specularFactor = pow(specularFactor, rec.bp->specularexponent);
                             vec3 specular = light->intensity * rec.bp->specularcolor * specularFactor;
-                            pixelColor += specular;
+                            pixelColor += clamp(specular, 0.0, 1.0);
                         }                       
                     }
                 }
