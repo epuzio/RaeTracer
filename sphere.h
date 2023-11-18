@@ -6,7 +6,7 @@
 
 class sphere : public shape {
   public:
-    sphere(point3 c, double r, material bp) : center(c), radius(r), bp(bp) {}
+    sphere(point3 c, double r, shared_ptr<material> bp) : center(c), radius(r), bp(bp) {}
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
       vec3 oc = r.origin() - center;
@@ -22,6 +22,7 @@ class sphere : public shape {
               rec.t = temp;
               rec.p = r.at(rec.t);
               rec.normal = (rec.p - center) / radius;
+              rec.bp = bp;
               return true;
           }
       }
@@ -31,7 +32,7 @@ class sphere : public shape {
   private:
     point3 center;
     double radius;
-    material bp;
+    shared_ptr<material> bp;
 };
 
 #endif

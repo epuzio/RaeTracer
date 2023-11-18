@@ -106,34 +106,33 @@ class camera {
             if (world.hit(r, interval(0, infinity), rec)) {
                 //Ambient:
                 vec3 normal = normalize(rec.normal);
-                vec3 surfaceColor = rec.bp.diffusecolor*0.5; 
-                cout << rec.bp.diffusecolor << endl;
+                vec3 surfaceColor = rec.bp->diffusecolor*0.5; 
                 vec3 ambient = world.backgroundcolor * surfaceColor; // Ambient reflection
                 vec3 pixelColor = ambient; // Initialize with ambient light
                         
-                // // Iterate through each light source in the scene
-                // for (const auto& light : world.lights) {
-                //     //Diffuse:
-                //     vec3 lightDir = normalize(light->position - rec.p);
-                //     double diffuseFactor = dot(normal, lightDir); // Diffuse reflection
+                // Iterate through each light source in the scene
+                for (const auto& light : world.lights) {
+                    //Diffuse:
+                    vec3 lightDir = normalize(light->position - rec.p);
+                    double diffuseFactor = dot(normal, lightDir); // Diffuse reflection
                     
-                //     if (diffuseFactor > 0) {
-                //             // Calculate diffuse contribution
-                //         vec3 diffuse = light->intensity * surfaceColor * diffuseFactor;
-                //         pixelColor += diffuse;
+                    if (diffuseFactor > 0) {
+                            // Calculate diffuse contribution
+                        vec3 diffuse = light->intensity * surfaceColor * diffuseFactor;
+                        pixelColor += diffuse;
                         
-                //         vec3 viewDir = normalize(cameraPosition - rec.p);
-                //         vec3 reflectDir = reflect(-lightDir, normal); // Calculate reflection direction
+                        vec3 viewDir = normalize(cameraPosition - rec.p);
+                        vec3 reflectDir = reflect(-lightDir, normal); // Calculate reflection direction
                         
-                //         // Calculate specular contribution using the Phong equation
-                //         double specularFactor = dot(viewDir, reflectDir);
-                //         if (specularFactor > 0) {
-                //             specularFactor = pow(specularFactor, rec.bp.specularexponent);
-                //             vec3 specular = light->intensity * rec.bp.specularcolor * specularFactor;
-                //             pixelColor += specular;
-                //         }                       
-                //     }
-                // }
+                        // Calculate specular contribution using the Phong equation
+                        double specularFactor = dot(viewDir, reflectDir);
+                        if (specularFactor > 0) {
+                            specularFactor = pow(specularFactor, rec.bp->specularexponent);
+                            vec3 specular = light->intensity * rec.bp->specularcolor * specularFactor;
+                            pixelColor += specular;
+                        }                       
+                    }
+                }
                         
                 // Ensure final pixel color is within the valid range [0, 1]
                 pixelColor = clamp(pixelColor, 0.0, 1.0);

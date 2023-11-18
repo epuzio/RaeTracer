@@ -106,7 +106,8 @@ void setWorldParameters(scene& world, json input){
 
     //Push shapes from JSON input: (and materials (to-do))
     for (const auto& s : shapesInput) {
-        material mat = setMaterialParameters(world, s);
+        shared_ptr<material> mat = make_shared<material>(setMaterialParameters(world, s));
+
         if (s["type"] == "sphere"){
             world.add(make_shared<sphere>(
                 point3(
@@ -177,8 +178,5 @@ int main() {
     } else {
         cerr << "Unable to open json file." << endl;
     }
-
-    cout << world.objects.size() << endl;
-    cout << world.lights.size() << endl;
     cam.render(world);
 };

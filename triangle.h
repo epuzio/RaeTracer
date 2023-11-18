@@ -7,7 +7,7 @@
 
 class triangle : public shape {
   public:
-    triangle(point3 v0, point3 v1, point3 v2, material bp) : v0(v0), v1(v1), v2(v2), bp(bp) {}
+    triangle(point3 v0, point3 v1, point3 v2, shared_ptr<material> bp) : v0(v0), v1(v1), v2(v2), bp(bp) {}
 
     bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
         //Using Möller-Trumbore algorithm:
@@ -41,8 +41,9 @@ class triangle : public shape {
         if (t < ray_t.min || t > ray_t.max) {
             return false;
         }
-
-        rec.p = r.at(t); //not setting normals.... fix later w/ phong
+        rec.t = t; //i don't know if this is correct
+        rec.p = r.at(t);
+        rec.bp = bp;
         return true; // Ray intersects the triangle
     }
 
@@ -50,7 +51,7 @@ class triangle : public shape {
     point3 v0;
     point3 v1;
     point3 v2;
-    material bp;
+    shared_ptr<material> bp;
 };
 
 #endif
