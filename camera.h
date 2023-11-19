@@ -128,23 +128,19 @@ class camera {
                     //Diffuse:
                     vec3 lightDir = normalize(light->position - rec.p);
                     double diffuseFactor = dot(rec.normal, lightDir); // Diffuse reflection
-                    
                     if (diffuseFactor > 0) {
                         // Calculate diffuse contribution
                         vec3 diffuse = light->intensity * rec.bp->diffusecolor * diffuseFactor * rec.bp->kd;
-                        pixelColor += clamp(diffuse, 0.0, 1.0);
-                        
-                        vec3 viewDir = normalize(cameraPosition - rec.p);
-                        vec3 reflectDir = reflect(-lightDir, rec.normal); // Calculate reflection direction
-                        
-                        // Calculate specular contribution using the Phong equation
-                        double specularFactor = dot(viewDir, reflectDir);
-                        if (specularFactor > 0) {
-                            specularFactor = pow(specularFactor, rec.bp->specularexponent);
-                            vec3 specular = light->intensity * rec.bp->specularcolor * specularFactor * rec.bp->ks;
-                            pixelColor += clamp(specular, 0.0, 1.0);
-                        }                       
+                        pixelColor += clamp(diffuse, 0.0, 1.0);            
                     }
+
+                    //Specular:
+                    vec3 viewDir = normalize(cameraPosition - rec.p);
+                    // vec3 reflectDir = reflect(-lightDir, rec.normal); // Calculate reflection direction
+                    vec3 halfway = normalize(lightDir + viewDir);
+                    float specularIntensity = pow(max(0.0, dot(rec.normal, halfway)), rec.bp->specularexponent);
+                    vec3 specular = light->intensity * rec.bp->specularcolor * specularIntensity * rec.bp->ks;
+                    pixelColor += clamp(specular, 0.0, 1.0);   
                 }
                         
                 // Ensure final pixel color is within the valid range [0, 1]

@@ -21,7 +21,7 @@ class sphere : public shape {
           if (temp < ray_t.max && temp > ray_t.min) {
               rec.t = temp;
               rec.p = r.at(rec.t);
-              rec.set_face_normal(r, normalize((rec.p - center) / radius));
+              rec.set_face_normal(r, (rec.p - center) / radius);
               rec.bp = bp;
               return true;
           }
