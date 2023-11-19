@@ -150,13 +150,14 @@ class camera {
                 
                 if (rec.bp->isreflective && rec.bp->reflectivity > 0.0f) {
                         vec3 reflectedDir = reflect(r.direction(), rec.normal);
+                        vec3 refractedDir = snell(r.direction(), rec.normal, rec.bp->refractiveindex);
+
                         double cosI = dot(-r.direction(), rec.normal);
                         double cosT = sqrt(1.0 - (1.0 - cosI * cosI) / (pow(rec.bp->refractiveindex, 2)));
-                        
+
                         double Rs = pow((rec.bp->refractiveindex * cosI - cosT) / (rec.bp->refractiveindex * cosI + cosT), 2);
                         double Rp = pow((rec.bp->refractiveindex * cosT - cosI) / (rec.bp->refractiveindex * cosT + cosI), 2);
                         double reflectance = 0.5 * (Rs + Rp);
-
                         // Calculate transmission coefficient (assuming no absorption)
                         double transmittance = 1.0 - reflectance;
 
@@ -172,17 +173,6 @@ class camera {
                         color finalColor = (reflectance * reflected) + (transmittance * transmitted);
                         return finalColor;
 
-
-                        // // old code
-                        // vec3 reflectedDir = reflect(r.direction(), rec.normal);
-                        // // Create a reflection ray
-                        // ray reflectionRay(rec.p, reflectedDir);
-                        // // Trace the reflection ray recursively to get reflected color
-                        // color reflectedColor = rayColor(reflectionRay, world, maxDepth - 1);
-                        // // Combine the reflected color with the final color using the reflectivity factor
-                        // pixelColor += reflectedColor * rec.bp->reflectivity;
-                    
-                    
                     }
                 }
                         

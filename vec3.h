@@ -120,6 +120,19 @@ vec3 refract(const vec3& incident, const vec3& normal, double refractiveIndex) {
     }
 }
 
+vec3 snell(const vec3 &incident, const vec3 &normal, double refractiveIndex) {
+    double cosI = dot(-incident, normal);
+    double sinT2 = refractiveIndex * refractiveIndex * (1.0 - cosI * cosI);
+
+    if (sinT2 > 1.0) {
+        // Total internal reflection
+        return reflect(incident, normal);
+    }
+
+    double cosT = sqrt(1.0 - sinT2);
+    return refractiveIndex * incident + (refractiveIndex * cosI - cosT) * normal;
+}
+
 //add aliases for vec3 //copilot
 using point3 = vec3; // 3D point
 using color = vec3 ; // RGB color
