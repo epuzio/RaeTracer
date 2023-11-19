@@ -19,10 +19,6 @@ class hit_record {
         // NOTE: the parameter `outward_normal` is assumed to have unit length (edit: this is explicitly calculated now)
 
         front_face = dot(r.direction(), normalize(outward_normal)) < 0;
-        // cout << "nm: " << normalize(outward_normal) << endl; // "normalize" is redundant here, but it's good practice to use it anyway
-        // cout << "rd: " << r.direction() << endl;
-        // cout << "ff: " << front_face << endl;
-        cout << "hit: " << p << endl;
         normal = front_face ? outward_normal : -outward_normal;
     }
 };
