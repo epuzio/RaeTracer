@@ -20,10 +20,13 @@ class material {
     double reflectivity;
     bool isrefractive;
     double refractiveindex;
+    bool hastexture = false;
 
     material() {}
     material(double ks, double kd, double specularexponent, color diffusecolor, color specularcolor, bool isreflective, double reflectivity, bool isrefractive, double refractiveindex)
         : ks(ks), kd(kd), specularexponent(specularexponent), diffusecolor(diffusecolor), specularcolor(specularcolor), isreflective(isreflective), reflectivity(reflectivity), isrefractive(isrefractive), refractiveindex(refractiveindex) {}
+    material(double ks, double kd, double specularexponent, color diffusecolor, color specularcolor, bool isreflective, double reflectivity, bool isrefractive, double refractiveindex, bool hastexture)
+        : ks(ks), kd(kd), specularexponent(specularexponent), diffusecolor(diffusecolor), specularcolor(specularcolor), isreflective(isreflective), reflectivity(reflectivity), isrefractive(isrefractive), refractiveindex(refractiveindex), hastexture(hastexture) {}
     ~material() = default;
 };
 

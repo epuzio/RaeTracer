@@ -83,8 +83,8 @@ inline vec3 normalize(vec3 v) {
     return v;
 }
 
-inline vec3 reflect(const vec3& I, const vec3& N) { //added by copilot from "inline vec3 reflect"
-    return I - 2.0 * dot(N, I) * N;
+inline vec3 reflect(const vec3& incident, const vec3& normal) { //added by copilot from "inline vec3 reflect"
+    return incident - 2.0 * dot(incident, normal) * normal;
 }
 
 inline vec3 clamp(vec3 v, double min, double max) {

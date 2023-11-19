@@ -141,6 +141,18 @@ class camera {
                     float specularIntensity = pow(max(0.0, dot(rec.normal, halfway)), rec.bp->specularexponent);
                     vec3 specular = light->intensity * rec.bp->specularcolor * specularIntensity * rec.bp->ks;
                     pixelColor += clamp(specular, 0.0, 1.0);   
+                
+                if (rec.bp->isreflective && rec.bp->reflectivity > 0.0f) {
+                        vec3 reflectedDir = reflect(r.direction(), rec.normal);
+                        // Create a reflection ray
+                        ray reflectionRay(rec.p, reflectedDir);
+
+                        // Trace the reflection ray recursively to get reflected color
+                        color reflectedColor = rayColor(reflectionRay, world);
+
+                        // Combine the reflected color with the final color using the reflectivity factor
+                        pixelColor = pixelColor * (1.0f - rec.bp->reflectivity) + (reflectedColor * rec.bp->reflectivity);
+                    }
                 }
                         
                 // Ensure final pixel color is within the valid range [0, 1]
