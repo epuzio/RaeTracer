@@ -33,7 +33,7 @@ class camera {
     double exposure;
     
     //not from JSON input:
-    int numSamples = 2; //to prevent aliasing
+    int numSamples = 1; //to prevent aliasing
     vec3 right, up, forward; //basis vectors for camera cameraPosition
 
     camera() {}
@@ -45,7 +45,7 @@ class camera {
         up = normalize(cross(right,forward));
     }
    
-   void render(const scene& world) const {
+   void render(const scene& world, int maxDepth) const {
         outputFile << "P3\n" << width << ' ' << height << "\n255\n"; 
         vec3 rays;
 
@@ -79,7 +79,7 @@ class camera {
                     vec3 pixelCenter = (topLeftPixel + (x * horizontalStep) + (y * verticalStep) - cameraPosition);
                     vec3 rayDirection = pixelCenter - (jitterpx * horizontalStep * .5) + (jitterpy * verticalStep * .5);
                     ray r(cameraPosition, rayDirection); //ray r normalizes direction
-                    pixelColor += rayColor(r, world);
+                    pixelColor += rayColor(r, world, maxDepth);
                 }
                 writeColor(outputFile, pixelColor, numSamples);
             }
@@ -91,10 +91,11 @@ class camera {
 
 //GET COLOR OF RAY
     //rayColor function //copilot
-    color rayColor(const ray& r, const scene& world) const {
-        if (nbounces <= 0) {
+    color rayColor(const ray& r, const scene& world, int maxDepth) const {
+        if (maxDepth <= 0) {
             return color(0,0,0);
         }
+
         hit_record rec;
         if(rendermode == "binary"){
             if(world.hit(r, interval(0, infinity), rec)) { //copilot autofill
@@ -105,6 +106,17 @@ class camera {
         if(rendermode == "phong"){
             hit_record rec;
             if (world.hit(r, interval(0, infinity), rec)) {
+                if(maxDepth == 1){
+                    if(rec.bp->diffusecolor.x == 0.8 &&
+                        rec.bp->diffusecolor.y == 0.5 &&
+                        rec.bp->diffusecolor.z == 0.5){
+                            cout << "SPHERE HIT" << endl;
+                    }
+                    vec3 ambient = world.backgroundcolor * rec.bp->diffusecolor; // Ambient reflection
+                    vec3 pixelColor = clamp(ambient, 0.0, 1.0); 
+                    return color(pixelColor);
+                }
+                
                 //Ambient:
                 vec3 ambient = world.backgroundcolor * rec.bp->diffusecolor; // Ambient reflection
                 vec3 pixelColor = clamp(ambient, 0.0, 1.0); // Initialize with ambient light
@@ -112,18 +124,18 @@ class camera {
                 // Iterate through each light source in the scene
                 for (const auto& light : world.lights) {
                     //Shadow Calculation - don't calculate Diffuse or Specular if in shadow
-                        vec3 shadowRayOrigin = rec.p + (0.001 * rec.normal); //bit of bias
-                        vec3 directionToLight = normalize(light->position - shadowRayOrigin);
-                        ray shadowRay(shadowRayOrigin, directionToLight);
-                        if(dot(rec.normal, directionToLight) < 0) {
-                            hit_record shadowRec;
-                            if (world.hit(shadowRay, interval(0, infinity), shadowRec)) {
-                                if(shadowRec.t < directionToLight.length()){
-                                    return color(.3, .1, .2);
-                                    continue;
-                                }
-                            }//
-                        }
+                        // vec3 shadowRayOrigin = rec.p + (0.001 * rec.normal); //bit of bias
+                        // vec3 directionToLight = normalize(light->position - shadowRayOrigin);
+                        // ray shadowRay(shadowRayOrigin, directionToLight);
+                        // if(dot(rec.normal, directionToLight) < 0) {
+                        //     hit_record shadowRec;
+                        //     if (world.hit(shadowRay, interval(0, infinity), shadowRec)) {
+                        //         if(shadowRec.t < directionToLight.length()){
+                        //             return color(.3, .1, .2);
+                        //             continue;
+                        //         }
+                        //     }//
+                        // }
                     
                     //Diffuse:
                     vec3 lightDir = normalize(light->position - rec.p);
@@ -146,12 +158,10 @@ class camera {
                         vec3 reflectedDir = reflect(r.direction(), rec.normal);
                         // Create a reflection ray
                         ray reflectionRay(rec.p, reflectedDir);
-
                         // Trace the reflection ray recursively to get reflected color
-                        color reflectedColor = rayColor(reflectionRay, world);
-
+                        color reflectedColor = rayColor(reflectionRay, world, maxDepth - 1);
                         // Combine the reflected color with the final color using the reflectivity factor
-                        pixelColor = pixelColor * (1.0f - rec.bp->reflectivity) + (reflectedColor * rec.bp->reflectivity);
+                        pixelColor += reflectedColor * rec.bp->reflectivity;
                     }
                 }
                         
@@ -167,97 +177,3 @@ class camera {
 
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// //initial copilot output
-// clock_t c = clock();
-//         for (int y = 0; y < height; ++y) {
-//             clog << "\r[" << (height - y) / y << "]'%' of lines complete" << flush;
-//             // calculate pixel color //copilot
-//             for (int x = 0; x < width; ++x) {
-//                 vec3 pixelColor(0.0, 0.0, 0.0); //modified from color pixelColor = (0,0,0)
-//                 for (int s = 0; s < numSamples; ++s) {
-//                     double u = (x + random_double()) * pixelWidth - halfWidth;
-//                     double v = (y + random_double()) * pixelHeight - halfHeight;
-//                     ray r(cameraPosition, topLeft + u * right - v * up - cameraPosition); 
-//                     pixelColor += rayColor(r, world);
-//                 }
-//                 writeColor(cout, pixelColor, numSamples); //todo: write to image file
-//             }
-
-//         }
-//         clog << "\rDone in " << (clock() - c) / CLOCKS_PER_SEC << " ms.       \n";
-//     }
-
-
-
-
-
-// //original gpt code for phong
-// if (world.hit(r, interval(0, infinity), rec)) {
-//                 vec3 normal = unit_vector(rec.normal); // Ensure the normal is unit length
-//                 vec3 surfaceColor = world.colorAt(rec); // Get surface color from the object hit
-                
-//                 vec3 ambient = world.ambientColor * surfaceColor; // Ambient reflection
-                
-//                 vec3 pixelColor = ambient; // Initialize with ambient light
-                        
-//                         // Iterate through each light source in the scene
-//                 for (const auto& light : world.lights) {
-//                     vec3 lightDir = unit_vector(light.position - rec.p);
-//                     double diffuseFactor = dot(normal, lightDir); // Diffuse reflection
-                    
-//                     if (diffuseFactor > 0) {
-//                             // Calculate diffuse contribution
-//                         vec3 diffuse = light.intensity * surfaceColor * diffuseFactor;
-//                         pixelColor += diffuse;
-                        
-//                         vec3 viewDir = unit_vector(cameraPosition - rec.p);
-//                         vec3 reflectDir = reflect(-lightDir, normal); // Calculate reflection direction
-                        
-//                         // Calculate specular contribution using the Phong equation
-//                         double specularFactor = dot(viewDir, reflectDir);
-//                         if (specularFactor > 0) {
-//                             specularFactor = pow(specularFactor, world.shininess);
-//                             vec3 specular = light.intensity * world.specularColor * specularFactor;
-//                             pixelColor += specular;
-//                         }                       
-//                     }
-//                 }
-                        
-//                 // Ensure final pixel color is within the valid range [0, 1]
-//                 pixelColor = clamp(pixelColor, 0.0, 1.0);
-//                 return color(pixelColor);
-//             }
-//             return world.backgroundcolor; // If no object hit, return background color
-//             }
-
-
-
-
-//original gpt code: (put in the sphere class)
-// bool isShadowed(const vec3& point, const std::vector<Sphere>& spheres, const vec3& lightPosition) {
-//     vec3 toLight = lightPosition - point;
-//     Ray shadowRay(point, toLight.normalize());
-
-//     for (const auto& sphere : spheres) {
-//         if (sphere.intersect(shadowRay)) {
-//             return true; // The point is in shadow
-//         }
-//     }
-
-//     return false; // No objects block the light to the point
-// }

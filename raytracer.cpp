@@ -176,5 +176,5 @@ int main() {
     } else {
         cerr << "Unable to open json file." << endl;
     }
-    cam.render(world);
+    cam.render(world, input["nbounces"]);
 };
