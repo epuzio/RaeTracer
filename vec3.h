@@ -96,6 +96,30 @@ inline vec3 clamp(vec3 v, double min, double max) {
     if (v.z > max) { v.z = max; }
     return v;
 }
+
+vec3 refract(const vec3& incident, const vec3& normal, double refractiveIndex) { //all gpt
+    double cosI = -dot(incident, normal);
+    double etaI = 1.0; // Refractive index of the medium incident ray is in (e.g., air)
+    double etaT = refractiveIndex; // Refractive index of the material the ray is entering
+
+    if (cosI < 0) {
+        // Ray is entering the material, swap the indices
+        cosI = -cosI;
+        std::swap(etaI, etaT);
+    }
+
+    double etaRatio = etaI / etaT;
+    double k = 1.0 - etaRatio * etaRatio * (1.0 - cosI * cosI);
+
+    if (k < 0) {
+        // Total internal reflection, no refraction
+        return vec3(0, 0, 0); // Return a zero vector or handle appropriately
+    } else {
+        // Compute the refracted direction
+        return etaRatio * incident + (etaRatio * cosI - sqrt(k)) * normal;
+    }
+}
+
 //add aliases for vec3 //copilot
 using point3 = vec3; // 3D point
 using color = vec3 ; // RGB color

@@ -33,7 +33,7 @@ class camera {
     double exposure;
     
     //not from JSON input:
-    int numSamples = 1; //to prevent aliasing
+    int numSamples = 3; //to prevent aliasing
     vec3 right, up, forward; //basis vectors for camera cameraPosition
 
     camera() {}
@@ -111,17 +111,6 @@ class camera {
         if(rendermode == "phong"){
             hit_record rec;
             if (world.hit(r, interval(0, infinity), rec)) {
-                // if(maxDepth == 1){
-                //     if(rec.bp->diffusecolor.x == 0.8 &&
-                //         rec.bp->diffusecolor.y == 0.5 &&
-                //         rec.bp->diffusecolor.z == 0.5){
-                //             cout << "SPHERE HIT" << endl;
-                //     }
-                //     vec3 ambient = world.backgroundcolor * rec.bp->diffusecolor; // Ambient reflection
-                //     vec3 pixelColor = clamp(ambient, 0.0, 1.0); 
-                //     return color(pixelColor);
-                // }
-                
                 //Ambient:
                 vec3 ambient = world.backgroundcolor * rec.bp->diffusecolor; // Ambient reflection
                 vec3 pixelColor = clamp(ambient, 0.0, 1.0); // Initialize with ambient light
@@ -130,27 +119,18 @@ class camera {
                 for (const auto& light : world.lights) {
                     // Shadow Calculation - don't calculate Diffuse or Specular if in shadow
                     vec3 lightDir = normalize(light->position - rec.p);
-                    vec3 shadowRayOrigin = rec.p + (0.001 * rec.normal); //slight bias along the normal
+                    vec3 shadowRayOrigin = rec.p; //slight bias along the normal
                     vec3 directionToLight = normalize(light->position - shadowRayOrigin);
                     ray shadowRay(shadowRayOrigin, directionToLight);
                     if(dot(rec.normal, directionToLight) > 0) {
                         hit_record shadowRec;
-                        if (world.hit(shadowRay, interval(0.001, infinity), shadowRec)) {
+                        if (world.hit(shadowRay, interval(0, infinity), shadowRec)) {
                             if (shadowRec.t < (light->position - rec.p).length()) {
                                 // The hit point is in shadow, return an appropriate shadow color
-                                return color(0.3, 0.1, 0.2); // Adjust this color as needed
+                                continue; // Adjust this color as needed
                             }
                         }//
                     }
-                    // vec3 pointOnSurface = r.at(rec.t);
-                    // vec3 lightDir = normalize(light->position - pointOnSurface);
-                    // ray shadowRay(pointOnSurface + 0.001 * rec.normal, lightDir); // Avoid self-intersection
-                    // hit_record shadowRec;
-                    // if (world.hit(shadowRay, interval(0.001, infinity), shadowRec)) {
-                    //     // If an object is between the point and the light, it's in shadow
-                    //     continue; // Skip diffuse and specular calculations
-                    // }
-                    
                     
                     //Diffuse:
                     double diffuseFactor = dot(rec.normal, lightDir); // Diffuse reflection
@@ -170,12 +150,39 @@ class camera {
                 
                 if (rec.bp->isreflective && rec.bp->reflectivity > 0.0f) {
                         vec3 reflectedDir = reflect(r.direction(), rec.normal);
-                        // Create a reflection ray
+                        double cosI = dot(-r.direction(), rec.normal);
+                        double cosT = sqrt(1.0 - (1.0 - cosI * cosI) / (pow(rec.bp->refractiveindex, 2)));
+                        
+                        double Rs = pow((rec.bp->refractiveindex * cosI - cosT) / (rec.bp->refractiveindex * cosI + cosT), 2);
+                        double Rp = pow((rec.bp->refractiveindex * cosT - cosI) / (rec.bp->refractiveindex * cosT + cosI), 2);
+                        double reflectance = 0.5 * (Rs + Rp);
+
+                        // Calculate transmission coefficient (assuming no absorption)
+                        double transmittance = 1.0 - reflectance;
+
+                        // Create reflection and transmission rays
                         ray reflectionRay(rec.p, reflectedDir);
-                        // Trace the reflection ray recursively to get reflected color
-                        color reflectedColor = rayColor(reflectionRay, world, maxDepth - 1);
-                        // Combine the reflected color with the final color using the reflectivity factor
-                        pixelColor += reflectedColor * rec.bp->reflectivity;
+                        ray transmissionRay(rec.p, refract(r.direction(), rec.normal, rec.bp->refractiveindex));
+
+                        // Trace reflection and transmission rays recursively to get colors
+                        color reflected = rayColor(reflectionRay, world, maxDepth - 1);
+                        color transmitted = rayColor(transmissionRay, world, maxDepth - 1);
+
+                        // Calculate final color considering both reflection and transmission
+                        color finalColor = (reflectance * reflected) + (transmittance * transmitted);
+                        return finalColor;
+
+
+                        // // old code
+                        // vec3 reflectedDir = reflect(r.direction(), rec.normal);
+                        // // Create a reflection ray
+                        // ray reflectionRay(rec.p, reflectedDir);
+                        // // Trace the reflection ray recursively to get reflected color
+                        // color reflectedColor = rayColor(reflectionRay, world, maxDepth - 1);
+                        // // Combine the reflected color with the final color using the reflectivity factor
+                        // pixelColor += reflectedColor * rec.bp->reflectivity;
+                    
+                    
                     }
                 }
                         
