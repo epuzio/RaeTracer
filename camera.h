@@ -129,21 +129,30 @@ class camera {
                 // Iterate through each light source in the scene
                 for (const auto& light : world.lights) {
                     // Shadow Calculation - don't calculate Diffuse or Specular if in shadow
-                        vec3 shadowRayOrigin = rec.p + (0.001 * rec.normal); //slight bias along the normal
-                        vec3 directionToLight = normalize(light->position - shadowRayOrigin);
-                        ray shadowRay(shadowRayOrigin, directionToLight);
-                        if(dot(rec.normal, directionToLight) > 0) {
-                            hit_record shadowRec;
-                            if (world.hit(shadowRay, interval(0.001, infinity), shadowRec)) {
-                                if (shadowRec.t > 0 && shadowRec.t < (light->position - rec.p).length()) {
-                                    // The hit point is in shadow, return an appropriate shadow color
-                                    return color(0.3, 0.1, 0.2); // Adjust this color as needed
-                                }
-                            }//
-                        }
+                    vec3 lightDir = normalize(light->position - rec.p);
+                    vec3 shadowRayOrigin = rec.p + (0.001 * rec.normal); //slight bias along the normal
+                    vec3 directionToLight = normalize(light->position - shadowRayOrigin);
+                    ray shadowRay(shadowRayOrigin, directionToLight);
+                    if(dot(rec.normal, directionToLight) > 0) {
+                        hit_record shadowRec;
+                        if (world.hit(shadowRay, interval(0.001, infinity), shadowRec)) {
+                            if (shadowRec.t < (light->position - rec.p).length()) {
+                                // The hit point is in shadow, return an appropriate shadow color
+                                return color(0.3, 0.1, 0.2); // Adjust this color as needed
+                            }
+                        }//
+                    }
+                    // vec3 pointOnSurface = r.at(rec.t);
+                    // vec3 lightDir = normalize(light->position - pointOnSurface);
+                    // ray shadowRay(pointOnSurface + 0.001 * rec.normal, lightDir); // Avoid self-intersection
+                    // hit_record shadowRec;
+                    // if (world.hit(shadowRay, interval(0.001, infinity), shadowRec)) {
+                    //     // If an object is between the point and the light, it's in shadow
+                    //     continue; // Skip diffuse and specular calculations
+                    // }
+                    
                     
                     //Diffuse:
-                    vec3 lightDir = normalize(light->position - rec.p);
                     double diffuseFactor = dot(rec.normal, lightDir); // Diffuse reflection
                     if (diffuseFactor > 0) {
                         // Calculate diffuse contribution
@@ -153,7 +162,7 @@ class camera {
 
                     //Specular:
                     vec3 viewDir = normalize(cameraPosition - rec.p);
-                    // vec3 reflectDir = reflect(-lightDir, rec.normal); // Calculate reflection direction
+                    vec3 reflectDir = reflect(-lightDir, rec.normal); // Calculate reflection direction
                     vec3 halfway = normalize(lightDir + viewDir);
                     float specularIntensity = pow(max(0.0, dot(rec.normal, halfway)), rec.bp->specularexponent);
                     vec3 specular = light->intensity * rec.bp->specularcolor * specularIntensity * rec.bp->ks;
