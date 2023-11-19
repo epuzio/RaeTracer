@@ -129,30 +129,22 @@ class camera {
                 // Iterate through each light source in the scene
                 for (const auto& light : world.lights) {
                     // Shadow Calculation - don't calculate Diffuse or Specular if in shadow
-                        // // Create a shadow ray
-                        ray shadowRay(rec.p, normalize(light->position - rec.p));
-                        // // Check if the shadow ray intersects any objects in the scene
-                        hit_record shadowRec;
-                        if (world.hit(shadowRay, interval(0.001, infinity), shadowRec)) {
-                            if (shadowRec.t > 0 && shadowRec.t < (light->position - rec.p).length()) {
-                                // The hit point is in shadow, return an appropriate shadow color
-                                continue;
-                            }
+                        // cout << "rn:  " << rec.normal << endl;
+                        vec3 shadowRayOrigin = rec.p + (0.1 * rec.normal); //slight bias along the normal
+                        cout << shadowRayOrigin << endl;
+                        vec3 directionToLight = normalize(light->position - shadowRayOrigin);
+                        ray shadowRay(shadowRayOrigin, directionToLight);
+
+
+                        if(dot(rec.normal, directionToLight) > 0) {
+                            hit_record shadowRec;
+                            if (world.hit(shadowRay, interval(0.001, infinity), shadowRec)) {
+                                if (shadowRec.t > 0 && shadowRec.t < (light->position - rec.p).length()) {
+                                    // The hit point is in shadow, return an appropriate shadow color
+                                    return color(0.3, 0.1, 0.2); // Adjust this color as needed
+                                }
+                            }//
                         }
-
-
-                        // vec3 shadowRayOrigin = rec.p + (0.001 * rec.normal); //slight bias along the normal
-                        // vec3 directionToLight = normalize(light->position - shadowRayOrigin);
-                        // ray shadowRay(shadowRayOrigin, directionToLight);
-                        // if(dot(rec.normal, directionToLight) > 0) {
-                        //     hit_record shadowRec;
-                        //     if (world.hit(shadowRay, interval(0.001, infinity), shadowRec)) {
-                        //         if (shadowRec.t > 0 && shadowRec.t < (light->position - rec.p).length()) {
-                        //             // The hit point is in shadow, return an appropriate shadow color
-                        //             return color(0.3, 0.1, 0.2); // Adjust this color as needed
-                        //         }
-                        //     }//
-                        // }
                     
                     //Diffuse:
                     vec3 lightDir = normalize(light->position - rec.p);

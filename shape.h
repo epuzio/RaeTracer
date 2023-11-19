@@ -22,6 +22,7 @@ class hit_record {
         // cout << "nm: " << normalize(outward_normal) << endl; // "normalize" is redundant here, but it's good practice to use it anyway
         // cout << "rd: " << r.direction() << endl;
         // cout << "ff: " << front_face << endl;
+        cout << "hit: " << p << endl;
         normal = front_face ? outward_normal : -outward_normal;
     }
 };
