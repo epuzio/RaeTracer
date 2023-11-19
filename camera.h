@@ -74,11 +74,16 @@ class camera {
             for (int x = 0; x < width; ++x) {
                 vec3 pixelColor(0.0, 0.0, 0.0); //modified from color pixelColor = (0,0,0)
                 for (int s = 0; s < numSamples; ++s) {
-                    double jitterpx = (rand() / (RAND_MAX)) - 0.5; //x offset for anti-aliasing
-                    double jitterpy = (rand() / (RAND_MAX)) - 0.5; //y offset for anti-aliasing
-                    vec3 pixelCenter = (topLeftPixel + (x * horizontalStep) + (y * verticalStep) - cameraPosition);
-                    vec3 rayDirection = pixelCenter - (jitterpx * horizontalStep * .5) + (jitterpy * verticalStep * .5);
-                    ray r(cameraPosition, rayDirection); //ray r normalizes direction
+                    double jitterpx = (rand() / static_cast<double>(RAND_MAX)) - 0.5; // x offset for anti-aliasing
+                    double jitterpy = (rand() / static_cast<double>(RAND_MAX)) - 0.5; // y offset for anti-aliasing
+
+                    // Calculate sample position within the pixel
+                    double u = (x + (jitterpx / 2.0)) / (width - 1);
+                    double v = (y + (jitterpy / 2.0)) / (height - 1);
+
+                    vec3 samplePixel = topLeftPixel + (u * horizontal) + (v * vertical);
+                    vec3 rayDirection = samplePixel - cameraPosition;
+                    ray r(cameraPosition, rayDirection);
                     pixelColor += rayColor(r, world, maxDepth);
                 }
                 writeColor(outputFile, pixelColor, numSamples);
@@ -106,16 +111,16 @@ class camera {
         if(rendermode == "phong"){
             hit_record rec;
             if (world.hit(r, interval(0, infinity), rec)) {
-                if(maxDepth == 1){
-                    if(rec.bp->diffusecolor.x == 0.8 &&
-                        rec.bp->diffusecolor.y == 0.5 &&
-                        rec.bp->diffusecolor.z == 0.5){
-                            cout << "SPHERE HIT" << endl;
-                    }
-                    vec3 ambient = world.backgroundcolor * rec.bp->diffusecolor; // Ambient reflection
-                    vec3 pixelColor = clamp(ambient, 0.0, 1.0); 
-                    return color(pixelColor);
-                }
+                // if(maxDepth == 1){
+                //     if(rec.bp->diffusecolor.x == 0.8 &&
+                //         rec.bp->diffusecolor.y == 0.5 &&
+                //         rec.bp->diffusecolor.z == 0.5){
+                //             cout << "SPHERE HIT" << endl;
+                //     }
+                //     vec3 ambient = world.backgroundcolor * rec.bp->diffusecolor; // Ambient reflection
+                //     vec3 pixelColor = clamp(ambient, 0.0, 1.0); 
+                //     return color(pixelColor);
+                // }
                 
                 //Ambient:
                 vec3 ambient = world.backgroundcolor * rec.bp->diffusecolor; // Ambient reflection
@@ -123,16 +128,28 @@ class camera {
                         
                 // Iterate through each light source in the scene
                 for (const auto& light : world.lights) {
-                    //Shadow Calculation - don't calculate Diffuse or Specular if in shadow
-                        // vec3 shadowRayOrigin = rec.p + (0.001 * rec.normal); //bit of bias
+                    // Shadow Calculation - don't calculate Diffuse or Specular if in shadow
+                        // // Create a shadow ray
+                        ray shadowRay(rec.p, normalize(light->position - rec.p));
+                        // // Check if the shadow ray intersects any objects in the scene
+                        hit_record shadowRec;
+                        if (world.hit(shadowRay, interval(0.001, infinity), shadowRec)) {
+                            if (shadowRec.t > 0 && shadowRec.t < (light->position - rec.p).length()) {
+                                // The hit point is in shadow, return an appropriate shadow color
+                                continue;
+                            }
+                        }
+
+
+                        // vec3 shadowRayOrigin = rec.p + (0.001 * rec.normal); //slight bias along the normal
                         // vec3 directionToLight = normalize(light->position - shadowRayOrigin);
                         // ray shadowRay(shadowRayOrigin, directionToLight);
-                        // if(dot(rec.normal, directionToLight) < 0) {
+                        // if(dot(rec.normal, directionToLight) > 0) {
                         //     hit_record shadowRec;
-                        //     if (world.hit(shadowRay, interval(0, infinity), shadowRec)) {
-                        //         if(shadowRec.t < directionToLight.length()){
-                        //             return color(.3, .1, .2);
-                        //             continue;
+                        //     if (world.hit(shadowRay, interval(0.001, infinity), shadowRec)) {
+                        //         if (shadowRec.t > 0 && shadowRec.t < (light->position - rec.p).length()) {
+                        //             // The hit point is in shadow, return an appropriate shadow color
+                        //             return color(0.3, 0.1, 0.2); // Adjust this color as needed
                         //         }
                         //     }//
                         // }

@@ -43,7 +43,9 @@ class triangle : public shape {
         }
         
         rec.t = t;
-        rec.set_face_normal(r, normalize(cross(v1 - v0, v2 - v0)));
+        // cout << "norm: " << normalize(cross(edge1, edge2)) << endl;
+        rec.set_face_normal(r, normalize(cross(edge1, edge2)));
+        // cout << rec.normal << endl;
         rec.p = r.at(t);
         rec.bp = bp;
 
