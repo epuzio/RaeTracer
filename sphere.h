@@ -25,8 +25,6 @@ class sphere : public shape {
               rec.bp = bp;
               if(bp->hastexture){
                 rec.texturecoordinate = uvmap(rec.p, rec.bp->texture.size(), rec.bp->texture[0].size());
-                // cout << "UV: " << rec.bp->texture.size() << " " << rec.bp->texture[0].size() << endl;
-                // cout << "coicle: " <<  rec.texturecoordinate.x << " " << rec.texturecoordinate.y << endl;
               }
               return true;
           }
@@ -36,22 +34,10 @@ class sphere : public shape {
 
      // Function to map a point on the sphere to UV coordinates
     vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const{
-        // double phi;
-        // double theta;
-        // getSphericalCoordinates(normalize(point - center), phi, theta);
+        int u = int((point.x + radius) / (2 * radius) * textureWidth) % textureWidth;
+        int v = int((point.y + radius) / (2 * radius) * textureHeight) % textureHeight;
 
-        // float u = theta / (2.0f * M_PI);
-        // float v = phi / M_PI;
-
-        // float textureU = u * textureWidth;
-        // float textureV = v * textureHeight;
-        // return vec3(textureU, textureV, 0.0);
-
-        int u = int((point.x + radius) / (2 * radius) * textureWidth);
-        int v = int((point.y + radius) / (2 * radius) * textureHeight);
-
-        return vec3(u, v, 0); // Return the color based on the mapped UV coordinates
-        
+        return vec3(u, v, 0); // Return the color based on the mapped UV coordinates 
     }
 
   private:
