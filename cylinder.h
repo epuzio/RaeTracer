@@ -59,7 +59,7 @@ class cylinder : public shape {
         return false;
     }
 
-    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const override{
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight){
         //implement later
     }
 
