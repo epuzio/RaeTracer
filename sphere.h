@@ -55,7 +55,7 @@ class sphere : public shape {
     point3 center;
     double radius;
     shared_ptr<material> bp;
-    void getSphericalCoordinates(const vec3& point, double& phi, double& theta) {
+    void getSphericalCoordinates(const vec3& point, double& phi, double& theta) const {
       phi = atan2(point.z, point.x);
       theta = acos(point.y / radius);
     }

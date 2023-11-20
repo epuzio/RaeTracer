@@ -56,8 +56,6 @@ class cylinder : public shape {
             rec.bp = bp;
             return true;
         }
-
-        
         return false;
     }
 

@@ -20,30 +20,28 @@ using json = nlohmann::json;
 using point3 = vec3;
 
 bool readPPM(const char* filename, std::vector<std::vector<vec3>>& image) {
-    std::ifstream file(filename, std::ios::binary);
+    std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filename << std::endl;
         return false;
     }
 
     std::string format;
-    file >> format >> width >> height;
-    int maxColorValue;
-    file >> maxColorValue;
+    int width, height, maxColorValue;
+    file >> format >> width >> height >> maxColorValue;
 
-    if (format != "P6" || maxColorValue != 255) {
+    if (format != "P3" || maxColorValue != 255) {
         std::cerr << "Invalid or unsupported PPM format." << std::endl;
         return false;
     }
 
-    // Consume the newline character after maxColorValue
-    file.get();
-
-    // Resize the vector of vectors to store the image pixels
     image.resize(height);
     for (int i = 0; i < height; ++i) {
-        image[i].resize(width);
-        file.read(reinterpret_cast<char*>(image[i].data()), width * sizeof(vec3));
+        for (int j = 0; j < width; ++j) {
+            int r, g, b;
+            file >> r >> g >> b;
+            image[i].push_back(vec3(r, g, b) / 255.0); // Normalize to range [0, 1]
+        }
     }
 
     file.close();
