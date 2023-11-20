@@ -43,12 +43,12 @@ class cylinder : public shape {
         // Check intersection with the cylindrical body
         if (projection >= -height && projection <= height) {
             vec3 toCenter = p - center; // Vector from the cylinder center to the intersection point
-
             // Project 'toCenter' onto the cylinder's axis to find the projection vector
             vec3 projectionOntoAxis = dot(toCenter, axis) * axis;
-
             // Calculate the normal vector by subtracting the projection vector from 'toCenter'
-            vec3 outward_normal = normalize(toCenter - projectionOntoAxis);
+            vec3 perpendicularComponent = toCenter - projectionOntoAxis;
+            // Calculate the outward normal using the perpendicular component
+            vec3 outward_normal = normalize(perpendicularComponent);
 
             rec.set_face_normal(r, outward_normal);
             rec.t = t;

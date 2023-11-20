@@ -1,13 +1,13 @@
 {
-    "nbounces":4, 
+    "nbounces":8, 
     "rendermode":"phong",
     "camera":
         { 
             "type":"pinhole", 
             "width":1200, 
             "height":800,
-            "position":[0.0, 1, -2],
-            "lookAt":[0.0, -0.1, 1.0],
+            "position":[0.0, 0.75, -0.25],
+            "lookAt":[0.0, 0.35, 1.0],
             "upVector":[0.0, 1.0, 0.0],
             "fov":45.0,
             "exposure":0.1
@@ -19,33 +19,16 @@
                 { 
                     "type":"pointlight", 
                     "position":[0, 1.0, 0.5], 
-                    "intensity":[0.75, 0.75, 0.75] 
+                    "intensity":[0.5, 0.5, 0.5] 
                 }
             ], 
             "shapes":[ 
-                { 
-                    "type":"sphere", 
-                    "center": [-0.35, -0.2, 1],
-                    "radius":0.3, 
-                    "material":
-                        { 
-                            "ks":0.1, 
-                            "kd":0.9, 
-                            "specularexponent":20, 
-                            "diffusecolor":[0.8, 0.5, 0.5],
-                            "specularcolor":[1.0,1.0,1.0],
-                            "isreflective":false,
-                            "reflectivity":1.0,
-                            "isrefractive":false,
-                            "refractiveindex":1.0 
-                        } 
-                },
                 {
                     "type": "cylinder",
-                    "center": [0.3, 0, 1],
+                    "center": [-0.3, 0.19, 1],
                     "axis": [0, 1, 0],
-                    "radius": 0.25,
-                    "height": 0.5,
+                    "radius": 0.15,
+                    "height": 0.2,
                     "material":
                         { 
                             "ks":0.1, 
@@ -58,43 +41,7 @@
                             "isrefractive":false,
                             "refractiveindex":1.0 
                         } 
-                },
-                { 
-                    "type":"triangle", 
-                    "v0": [ -1, -0.5, 2],
-                    "v1": [ 1, -0.5, 2],
-                    "v2": [ 1, -0.5, 0],
-                    "material":
-                        { 
-                            "ks":0.1, 
-                            "kd":0.9, 
-                            "specularexponent":20, 
-                            "diffusecolor":[0.5, 0.8, 0.5],
-                            "specularcolor":[1.0,1.0,1.0],
-                            "isreflective":false,
-                            "reflectivity":1.0,
-                            "isrefractive":false,
-                            "refractiveindex":1.0 
-                        } 
-                },
-                { 
-                    "type":"triangle", 
-                    "v0": [-1, -0.5, 0],
-                    "v1": [-1, -0.5, 2],
-                    "v2": [ 1, -0.5, 0],
-                    "material":
-                        { 
-                            "ks":0.1, 
-                            "kd":0.9, 
-                            "specularexponent":20, 
-                            "diffusecolor":[0.5, 0.8, 0.5],
-                            "specularcolor":[1.0,1.0,1.0],
-                            "isreflective":false,
-                            "reflectivity":1.0,
-                            "isrefractive":false,
-                            "refractiveindex":1.0 
-                        } 
-                }  
+                }
             ] 
         } 
 }

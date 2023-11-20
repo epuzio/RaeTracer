@@ -77,7 +77,7 @@ class camera {
                 for (int s = 0; s < numSamples; ++s) {
                     double jitterpx = (rand() / static_cast<double>(RAND_MAX)) - 0.5; // x offset for anti-aliasing
                     double jitterpy = (rand() / static_cast<double>(RAND_MAX)) - 0.5; // y offset for anti-aliasing
-
+                    
                     // Calculate sample position within the pixel
                     double u = (x + (jitterpx / 2.0)) / (width - 1);
                     double v = (y + (jitterpy / 2.0)) / (height - 1);
@@ -87,7 +87,7 @@ class camera {
                     ray r(cameraPosition, rayDirection);
                     pixelColor += rayColor(r, world, maxDepth);
                 }
-                writeColor(outputFile, pixelColor, numSamples);
+                writeColor(outputFile, pixelColor, maxDepth);
             }
         }
         clog << "\rDone in " << (clock() - c) / CLOCKS_PER_SEC << " ms.       \n";
@@ -115,7 +115,7 @@ class camera {
                     double localContribution = (rec.bp->isreflective) ? 1.0 - rec.bp->reflectivity : 1.0; 
 
                     //Ambient:
-                    vec3 ambient = world.backgroundcolor * rec.bp->diffusecolor; // Ambient reflection
+                    vec3 ambient = 0.5 * rec.bp->diffusecolor; // Ambient reflection
                     vec3 pixelColor = clamp(localContribution*ambient, 0.0, 1.0); // Initialize with ambient light
                             
                     // Iterate through each light source in the scene
@@ -163,16 +163,16 @@ class camera {
                             pixelColor += clamp(localContribution*diffuse, 0.0, 1.0);            
                         }
 
-                        // //Specular:
-                        // vec3 viewDir = normalize(cameraPosition - rec.p);
-                        // vec3 halfway = normalize(lightDir + viewDir);
-                        // float specularIntensity = pow(max(0.0, dot(rec.normal, halfway)), rec.bp->specularexponent);
-                        // vec3 specular = light->intensity * rec.bp->specularcolor * specularIntensity * rec.bp->ks;
-                        // float normalLightHalfway = dot(rec.normal, halfway);
-                        // if (normalLightHalfway > 0.0) {
-                        //     // Calculate the specular contribution and add it to the pixel color
-                        //     pixelColor += clamp(localContribution * specular, 0.0, 1.0);
-                        // }
+                        //Specular:
+                        vec3 viewDir = normalize(cameraPosition - rec.p);
+                        vec3 halfway = normalize(lightDir + viewDir);
+                        float specularIntensity = pow(max(0.0, dot(rec.normal, halfway)), rec.bp->specularexponent);
+                        vec3 specular = light->intensity * rec.bp->specularcolor * (specularIntensity*.1) * rec.bp->ks;
+                        float normalLightHalfway = dot(rec.normal, halfway);
+                        if (normalLightHalfway > 0.0) {
+                            // Calculate the specular contribution and add it to the pixel color
+                            pixelColor += clamp(localContribution * specular, 0.0, 1.0);
+                        }
 
                     }
                             
