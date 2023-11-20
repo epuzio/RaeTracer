@@ -98,7 +98,7 @@ void setLightParameters(scene&world, json lightsInput){
 
 material setMaterialParameters(scene&world, json s){
     json materialInput = s["material"];
-    if (materialInput["hastexture"]) {
+    if (materialInput.find("hastexture") == materialInput.end() || !materialInput["hastexture"].get<bool>()) {
         return material(
             materialInput["ks"].get<double>(),
             materialInput["kd"].get<double>(),
@@ -217,7 +217,7 @@ int main() {
     camera cam;
 
     //JSON input
-    ifstream inputFile("debug.json");
+    ifstream inputFile("texture.json");
     json input;
 
     if (inputFile.is_open()) {

@@ -24,7 +24,9 @@ class sphere : public shape {
               rec.set_face_normal(r, (rec.p - center) / radius);
               rec.bp = bp;
               if(bp->hastexture){
-                rec.texturecoordinate = uvmap(rec.texturecoordinate, rec.bp->texture.size(), rec.bp->texture[0].size());
+                rec.texturecoordinate = uvmap(rec.p, rec.bp->texture.size(), rec.bp->texture[0].size());
+                // cout << "UV: " << rec.bp->texture.size() << " " << rec.bp->texture[0].size() << endl;
+                // cout << "coicle: " <<  rec.texturecoordinate.x << " " << rec.texturecoordinate.y << endl;
               }
               return true;
           }
@@ -34,26 +36,33 @@ class sphere : public shape {
 
      // Function to map a point on the sphere to UV coordinates
     vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const{
-        double phi;
-        double theta;
-        getSphericalCoordinates(normalize(point - center), phi, theta);
+        // double phi;
+        // double theta;
+        // getSphericalCoordinates(normalize(point - center), phi, theta);
 
-        float u = theta / (2.0f * M_PI);
-        float v = phi / M_PI;
+        // float u = theta / (2.0f * M_PI);
+        // float v = phi / M_PI;
 
-        float textureU = u * textureWidth;
-        float textureV = v * textureHeight;
-        return vec3(textureU, textureV, 0.0);
+        // float textureU = u * textureWidth;
+        // float textureV = v * textureHeight;
+        // return vec3(textureU, textureV, 0.0);
+
+        int u = int((point.x + radius) / (2 * radius) * textureWidth);
+        int v = int((point.y + radius) / (2 * radius) * textureHeight);
+
+        return vec3(u, v, 0); // Return the color based on the mapped UV coordinates
+        
     }
 
   private:
     point3 center;
     double radius;
     shared_ptr<material> bp;
-    void getSphericalCoordinates(const vec3& point, double& phi, double& theta) const {
-      phi = atan2(point.z, point.x);
-      theta = acos(point.y / radius);
-    }
+    // void getSphericalCoordinates(const vec3& point, double& phi, double& theta) const {
+    //   theta = atan2(point.y, point.x);
+    //   phi = acos(point.z / radius);
+    //   cout << "phi " << phi << " theta " << theta << endl;
+    // }
     
 };
 

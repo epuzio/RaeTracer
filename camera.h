@@ -111,13 +111,16 @@ class camera {
             if(rendermode == "phong"){
                 hit_record rec;
                 if (world.hit(r, interval(0, infinity), rec)) {
+
                     //Calculate local contribution based on the material's reflectivity
                     double localContribution = (rec.bp->isreflective) ? 1.0 - rec.bp->reflectivity : 1.0; 
                     vec3 pixelColor(0.0, 0.0, 0.0);
                     
                     //Texture (for now, an image will have its ambient color set to texture - can't be both ambient and textured)
                     if(rec.bp->hastexture){
-                        pixelColor = rec.bp->texture[rec.texturecoordinate.x][rec.texturecoordinate.y];
+                        // cout << "tc: " << rec.texturecoordinate.x << " " << rec.texturecoordinate.y << endl;
+                        pixelColor += rec.bp->texture[(int)rec.texturecoordinate.x][(int)rec.texturecoordinate.y];
+                        // cout << "texture: " << pixelColor << endl;
                         //Go to the ppm image whose path corresponds to the material's texturepath
                         //Get the color whose coordinate is at rec.texturecoordinate.x, rec.texturecoordinate.y
                     } else{
