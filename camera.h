@@ -150,7 +150,6 @@ class camera {
                             if (world.hit(shadowRay, interval(0, infinity), shadowRec)) {
                                 if (shadowRec.t < (light->position - rec.p).length()) {
                                     // The hit point is in shadow, return an appropriate shadow color
-                                    pixelColor = clamp(pixelColor, 0.0, 1.0);
                                     return color(pixelColor); 
                                 }
                             }//
@@ -164,13 +163,17 @@ class camera {
                             pixelColor += clamp(localContribution*diffuse, 0.0, 1.0);            
                         }
 
-                        //Specular:
-                        vec3 viewDir = normalize(cameraPosition - rec.p);
-                        vec3 reflectDir = reflect(-lightDir, rec.normal); // Calculate reflection direction
-                        vec3 halfway = normalize(lightDir + viewDir);
-                        float specularIntensity = pow(max(0.0, dot(rec.normal, halfway)), rec.bp->specularexponent);
-                        vec3 specular = light->intensity * rec.bp->specularcolor * specularIntensity * rec.bp->ks;
-                        pixelColor += clamp(localContribution*specular, 0.0, 1.0);  
+                        // //Specular:
+                        // vec3 viewDir = normalize(cameraPosition - rec.p);
+                        // vec3 halfway = normalize(lightDir + viewDir);
+                        // float specularIntensity = pow(max(0.0, dot(rec.normal, halfway)), rec.bp->specularexponent);
+                        // vec3 specular = light->intensity * rec.bp->specularcolor * specularIntensity * rec.bp->ks;
+                        // float normalLightHalfway = dot(rec.normal, halfway);
+                        // if (normalLightHalfway > 0.0) {
+                        //     // Calculate the specular contribution and add it to the pixel color
+                        //     pixelColor += clamp(localContribution * specular, 0.0, 1.0);
+                        // }
+
                     }
                             
                     // Ensure final pixel color is within the valid range [0, 1]

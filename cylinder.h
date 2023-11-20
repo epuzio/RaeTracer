@@ -29,7 +29,7 @@ class cylinder : public shape {
         double projection = dot(p - center, axis);
 
         // Check intersection with the bottom cap circle
-        if (projection < 0) {
+        if (projection < -height) {
             if (intersectCaps(r, ray_t, rec, false))
                 return true;
         }
@@ -42,8 +42,14 @@ class cylinder : public shape {
 
         // Check intersection with the cylindrical body
         if (projection >= -height && projection <= height) {
-            vec3 diff = p - center - projection * axis;
-            vec3 outward_normal = normalize(diff - dot(diff, axis) * axis / (height * height));
+            vec3 toCenter = p - center; // Vector from the cylinder center to the intersection point
+
+            // Project 'toCenter' onto the cylinder's axis to find the projection vector
+            vec3 projectionOntoAxis = dot(toCenter, axis) * axis;
+
+            // Calculate the normal vector by subtracting the projection vector from 'toCenter'
+            vec3 outward_normal = normalize(toCenter - projectionOntoAxis);
+
             rec.set_face_normal(r, outward_normal);
             rec.t = t;
             rec.p = p;
@@ -51,6 +57,7 @@ class cylinder : public shape {
             return true;
         }
 
+        
         return false;
     }
 
@@ -74,11 +81,11 @@ class cylinder : public shape {
         double distanceSquared = dot(toCenter, toCenter);
         if (distanceSquared <= radius * radius) {
             vec3 outward_normal = normalize(isTopCap ? axis : -axis);
-            rec.set_face_normal(r, outward_normal);
-            rec.t = t;
-            rec.p = p;
-            rec.bp = bp;
             if(dot(r.direction(), outward_normal) < 0){ //i added this line
+                rec.set_face_normal(r, outward_normal);
+                rec.t = t;
+                rec.p = p;
+                rec.bp = bp;
                 return true;
             }
         }
@@ -88,30 +95,3 @@ class cylinder : public shape {
 };
 
 #endif
-
-
-
-
-
-
-
-
-
-// //original copilot code:
-// bool hit(const ray& r, interval ray_t, hit_record& rec) const override{
-//             vec3 oc = r.origin() - center;
-//             double a = dot(r.direction(), r.direction()) - dot(r.direction(), axis)*dot(r.direction(), axis);
-//             double b = 2.0*(dot(r.direction(), oc) - dot(r.direction(), axis)*dot(oc, axis));
-//             double c = dot(oc, oc) - dot(oc, axis)*dot(oc, axis) - radius*radius;
-//             double discriminant = b*b - 4*a*c;
-//             if (discriminant < 0) return false;
-//             double t = (-b - sqrt(discriminant)) / (2.0*a);
-//             if (t < ray_t.min() || t > ray_t.max()) return false;
-//             point3 p = r.at(t);
-//             if (p.y() < center.y() || p.y() > center.y() + height) return false;
-//             vec3 outward_normal = (p - center - dot(p - center, axis)*axis) / radius;
-//             rec.set_face_normal(r, outward_normal);
-//             rec.t = t;
-//             rec.p = p;
-//             return true;
-//         }
