@@ -19,7 +19,7 @@
 using json = nlohmann::json;
 using point3 = vec3;
 
-bool readPPM(const char* filename, std::vector<vec3>& image, int& width, int& height) {
+bool readPPM(const char* filename, std::vector<std::vector<vec3>>& image) {
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filename << std::endl;
@@ -39,9 +39,12 @@ bool readPPM(const char* filename, std::vector<vec3>& image, int& width, int& he
     // Consume the newline character after maxColorValue
     file.get();
 
-    image.resize(width * height);
-
-    file.read(reinterpret_cast<char*>(image.data()), width * height * sizeof(vec3));
+    // Resize the vector of vectors to store the image pixels
+    image.resize(height);
+    for (int i = 0; i < height; ++i) {
+        image[i].resize(width);
+        file.read(reinterpret_cast<char*>(image[i].data()), width * sizeof(vec3));
+    }
 
     file.close();
     return true;
@@ -118,10 +121,8 @@ material setMaterialParameters(scene&world, json s){
             materialInput["refractiveindex"].get<double>()
         );
     } else {
-        vector<vec3> img;
-        double h;
-        double w;
-        materialInput["texturepath"].get<string>().c_str(), img, w, h;
+        vector<vector<vec3>> img;
+        readPPM(materialInput["texturepath"].get<string>().c_str(), img);
         return material(
             materialInput["ks"].get<double>(),
             materialInput["kd"].get<double>(),
@@ -141,8 +142,7 @@ material setMaterialParameters(scene&world, json s){
             materialInput["isrefractive"].get<bool>(),
             materialInput["refractiveindex"].get<double>(),
             materialInput["hastexture"].get<bool>(),
-            img, 
-            vec3(w, h, 0)
+            img
         );
     }
 }

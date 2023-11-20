@@ -24,7 +24,7 @@ class sphere : public shape {
               rec.set_face_normal(r, (rec.p - center) / radius);
               rec.bp = bp;
               if(bp->hastexture){
-                rec.texturecoordinate = uvmap(rec.p, 2000, 2000);
+                rec.texturecoordinate = uvmap(rec.texturecoordinate, rec.bp->texture.size(), rec.bp->texture[0].size());
               }
               return true;
           }
@@ -32,9 +32,12 @@ class sphere : public shape {
       return false;
     }
 
+      
+      
     // Function to map a point on the sphere to UV coordinates
-    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) {
-        double phi, theta;
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const override{
+        double phi;
+        double theta;
         getSphericalCoordinates(normalize(point - center), phi, theta);
 
         float u = theta / (2.0f * M_PI);
@@ -45,16 +48,17 @@ class sphere : public shape {
         return vec3(textureU, textureV, 0.0);
     }
 
-    void getSphericalCoordinates(const vec3& point, double& phi, double& theta) {
-      phi = atan2(point.z, point.x);
-      theta = acos(point.y / radius);
-    }
+  
 
 
   private:
     point3 center;
     double radius;
     shared_ptr<material> bp;
+    void getSphericalCoordinates(const vec3& point, double& phi, double& theta) {
+      phi = atan2(point.z, point.x);
+      theta = acos(point.y / radius);
+    }
 };
 
 #endif

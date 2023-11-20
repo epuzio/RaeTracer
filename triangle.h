@@ -51,6 +51,10 @@ class triangle : public shape {
         return true;
     }
 
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const override{
+      //implement later
+    }
+
   private:
     point3 v0;
     point3 v1;

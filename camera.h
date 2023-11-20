@@ -113,20 +113,20 @@ class camera {
                 if (world.hit(r, interval(0, infinity), rec)) {
                     //Calculate local contribution based on the material's reflectivity
                     double localContribution = (rec.bp->isreflective) ? 1.0 - rec.bp->reflectivity : 1.0; 
-
-                    //Texture:
+                    vec3 pixelColor(0.0, 0.0, 0.0);
+                    
+                    //Texture (for now, an image will have its ambient color set to texture - can't be both ambient and textured)
                     if(rec.bp->hastexture){
-                        int line = static_cast<int>((y / x) * imageWidth);
-                        
-
+                        pixelColor = rec.bp->texture[rec.texturecoordinate.x][rec.texturecoordinate.y];
                         //Go to the ppm image whose path corresponds to the material's texturepath
                         //Get the color whose coordinate is at rec.texturecoordinate.x, rec.texturecoordinate.y
+                    } else{
+                        //Ambient:
+                        vec3 ambient = 0.5 * rec.bp->diffusecolor; // Ambient reflection
+                        pixelColor = clamp(localContribution*ambient, 0.0, 1.0); // Initialize with ambient light
                     }
                     
-                    //Ambient:
-                    vec3 ambient = 0.5 * rec.bp->diffusecolor; // Ambient reflection
-                    vec3 pixelColor = clamp(localContribution*ambient, 0.0, 1.0); // Initialize with ambient light
-                            
+                           
                     // Iterate through each light source in the scene
                     for (const auto& light : world.lights) {
                         //Reflective

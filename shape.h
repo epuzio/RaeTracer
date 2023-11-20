@@ -28,7 +28,7 @@ class shape {
   public:
     virtual ~shape() {};
     virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const = 0;
-    virtual vec3 uvmap(const vec3& point, int textureWidth, int textureHeight);
+    virtual vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const = 0;
 };
 
 
