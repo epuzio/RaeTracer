@@ -51,7 +51,7 @@ class triangle : public shape {
         return true;
     }
 
-    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) {
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) { //all gpt
         // Calculate barycentric coordinates
         vec3 edge1 = v1 - v0;
         vec3 edge2 = v2 - v0;

@@ -59,8 +59,27 @@ class cylinder : public shape {
         return false;
     }
 
-    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight){
-        //implement later
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight){ //all gpt
+        vec3 toCenter = point - center;
+        vec3 projectionOntoAxis = dot(toCenter, axis) * axis;
+        vec3 perpendicularComponent = toCenter - projectionOntoAxis;
+        
+        // Calculate phi angle based on the circular cross-section around the cylinder
+        double phi = atan2(perpendicularComponent.y, perpendicularComponent.x);
+        if (phi < 0.0)
+            phi += 2.0 * M_PI; // Ensure phi is in the range [0, 2π]
+
+        // Map the phi angle to the range of texture coordinates (0, 1)
+        double u = phi / (2.0 * M_PI);
+
+        // Map the height of the point to the range of texture coordinates (0, 1)
+        double v = (dot(toCenter, axis) + height) / (2.0 * height);
+
+        // Map the normalized coordinates to the texture size
+        float textureU = u * textureWidth;
+        float textureV = v * textureHeight;
+
+        return vec3(textureU, textureV, 0.0f);
     }
 
   private:

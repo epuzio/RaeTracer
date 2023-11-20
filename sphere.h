@@ -32,14 +32,6 @@ class sphere : public shape {
       return false;
     }
 
-  private:
-    point3 center;
-    double radius;
-    shared_ptr<material> bp;
-    void getSphericalCoordinates(const vec3& point, double& phi, double& theta) const {
-      phi = atan2(point.z, point.x);
-      theta = acos(point.y / radius);
-    }
      // Function to map a point on the sphere to UV coordinates
     vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const{
         double phi;
@@ -53,6 +45,16 @@ class sphere : public shape {
         float textureV = v * textureHeight;
         return vec3(textureU, textureV, 0.0);
     }
+
+  private:
+    point3 center;
+    double radius;
+    shared_ptr<material> bp;
+    void getSphericalCoordinates(const vec3& point, double& phi, double& theta) const {
+      phi = atan2(point.z, point.x);
+      theta = acos(point.y / radius);
+    }
+    
 };
 
 #endif
