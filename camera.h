@@ -111,9 +111,12 @@ class camera {
             if(rendermode == "phong"){
                 hit_record rec;
                 if (world.hit(r, interval(0, infinity), rec)) {
+                    //Calculate local contribution based on the material's reflectivity
+                    double localContribution = (rec.bp->isreflective) ? 1.0 - rec.bp->reflectivity : 1.0; 
+
                     //Ambient:
                     vec3 ambient = world.backgroundcolor * rec.bp->diffusecolor; // Ambient reflection
-                    vec3 pixelColor = clamp(ambient, 0.0, 1.0); // Initialize with ambient light
+                    vec3 pixelColor = clamp(localContribution*ambient, 0.0, 1.0); // Initialize with ambient light
                             
                     // Iterate through each light source in the scene
                     for (const auto& light : world.lights) {
@@ -152,9 +155,6 @@ class camera {
                                 }
                             }//
                         }
-
-                        //Calculate local contribution based on the material's reflectivity
-                        double localContribution = (rec.bp->isreflective) ? 1.0 - rec.bp->reflectivity : 1.0; 
                         
                         //Diffuse:
                         double diffuseFactor = dot(rec.normal, lightDir); // Diffuse reflection
@@ -171,8 +171,6 @@ class camera {
                         float specularIntensity = pow(max(0.0, dot(rec.normal, halfway)), rec.bp->specularexponent);
                         vec3 specular = light->intensity * rec.bp->specularcolor * specularIntensity * rec.bp->ks;
                         pixelColor += clamp(localContribution*specular, 0.0, 1.0);  
-
-                        
                     }
                             
                     // Ensure final pixel color is within the valid range [0, 1]
