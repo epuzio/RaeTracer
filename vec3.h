@@ -112,8 +112,8 @@ vec3 refract(const vec3& incident, const vec3& normal, double refractiveIndex) {
     double k = 1.0 - etaRatio * etaRatio * (1.0 - cosI * cosI);
 
     if (k < 0) {
-        // Total internal reflection, no refraction
-        return vec3(0, 0, 0); // Return a zero vector or handle appropriately
+        // Total internal reflection, no refraction, return the reflected direction instead of zero vector
+        return reflect(incident, normal); 
     } else {
         // Compute the refracted direction
         return etaRatio * incident + (etaRatio * cosI - sqrt(k)) * normal;

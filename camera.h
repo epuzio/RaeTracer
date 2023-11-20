@@ -94,95 +94,90 @@ class camera {
 
 
 
-//GET COLOR OF RAY
+    //GET COLOR OF RAY
     //rayColor function //copilot
     color rayColor(const ray& r, const scene& world, int maxDepth) const {
         if (maxDepth <= 0) {
             return color(0,0,0);
-        }
-
-        hit_record rec;
-        if(rendermode == "binary"){
-            if(world.hit(r, interval(0, infinity), rec)) { //copilot autofill
-                return color(1, 0, 0);
-            }
-        } 
-
-        if(rendermode == "phong"){
+        } else{
             hit_record rec;
-            if (world.hit(r, interval(0, infinity), rec)) {
-                //Ambient:
-                vec3 ambient = world.backgroundcolor * rec.bp->diffusecolor; // Ambient reflection
-                vec3 pixelColor = clamp(ambient, 0.0, 1.0); // Initialize with ambient light
-                        
-                // Iterate through each light source in the scene
-                for (const auto& light : world.lights) {
-                    // Shadow Calculation - don't calculate Diffuse or Specular if in shadow
-                    vec3 lightDir = normalize(light->position - rec.p);
-                    vec3 shadowRayOrigin = rec.p; //slight bias along the normal
-                    vec3 directionToLight = normalize(light->position - shadowRayOrigin);
-                    ray shadowRay(shadowRayOrigin, directionToLight);
-                    if(dot(rec.normal, directionToLight) > 0) {
-                        hit_record shadowRec;
-                        if (world.hit(shadowRay, interval(0, infinity), shadowRec)) {
-                            if (shadowRec.t < (light->position - rec.p).length()) {
-                                // The hit point is in shadow, return an appropriate shadow color
-                                continue; // Adjust this color as needed
-                            }
-                        }//
-                    }
-                    
-                    //Diffuse:
-                    double diffuseFactor = dot(rec.normal, lightDir); // Diffuse reflection
-                    if (diffuseFactor > 0) {
-                        // Calculate diffuse contribution
-                        vec3 diffuse = light->intensity * rec.bp->diffusecolor * diffuseFactor * rec.bp->kd;
-                        pixelColor += clamp(diffuse, 0.0, 1.0);            
-                    }
-
-                    //Specular:
-                    vec3 viewDir = normalize(cameraPosition - rec.p);
-                    vec3 reflectDir = reflect(-lightDir, rec.normal); // Calculate reflection direction
-                    vec3 halfway = normalize(lightDir + viewDir);
-                    float specularIntensity = pow(max(0.0, dot(rec.normal, halfway)), rec.bp->specularexponent);
-                    vec3 specular = light->intensity * rec.bp->specularcolor * specularIntensity * rec.bp->ks;
-                    pixelColor += clamp(specular, 0.0, 1.0);   
-                
-                if (rec.bp->isreflective && rec.bp->reflectivity > 0.0f) {
-                        vec3 reflectedDir = reflect(r.direction(), rec.normal);
-                        vec3 refractedDir = snell(r.direction(), rec.normal, rec.bp->refractiveindex);
-
-                        double cosI = dot(-r.direction(), rec.normal);
-                        double cosT = sqrt(1.0 - (1.0 - cosI * cosI) / (pow(rec.bp->refractiveindex, 2)));
-
-                        double Rs = pow((rec.bp->refractiveindex * cosI - cosT) / (rec.bp->refractiveindex * cosI + cosT), 2);
-                        double Rp = pow((rec.bp->refractiveindex * cosT - cosI) / (rec.bp->refractiveindex * cosT + cosI), 2);
-                        double reflectance = 0.5 * (Rs + Rp);
-                        // Calculate transmission coefficient (assuming no absorption)
-                        double transmittance = 1.0 - reflectance;
-
-                        // Create reflection and transmission rays
-                        ray reflectionRay(rec.p, reflectedDir);
-                        ray transmissionRay(rec.p, refract(r.direction(), rec.normal, rec.bp->refractiveindex));
-
-                        // Trace reflection and transmission rays recursively to get colors
-                        color reflected = rayColor(reflectionRay, world, maxDepth - 1);
-                        color transmitted = rayColor(transmissionRay, world, maxDepth - 1);
-
-                        // Calculate final color considering both reflection and transmission
-                        color finalColor = (reflectance * reflected) + (transmittance * transmitted);
-                        return finalColor;
-
-                    }
+            if(rendermode == "binary"){
+                if(world.hit(r, interval(0, infinity), rec)) { //copilot autofill
+                    return color(1, 0, 0);
                 }
+            } 
+
+            if(rendermode == "phong"){
+                hit_record rec;
+                if (world.hit(r, interval(0, infinity), rec)) {
+                    //Ambient:
+                    vec3 ambient = world.backgroundcolor * rec.bp->diffusecolor; // Ambient reflection
+                    vec3 pixelColor = clamp(ambient, 0.0, 1.0); // Initialize with ambient light
+                            
+                    // Iterate through each light source in the scene
+                    for (const auto& light : world.lights) {
+                        // Shadow Calculation - don't calculate Diffuse or Specular if in shadow
+                        vec3 lightDir = normalize(light->position - rec.p);
+                        vec3 shadowRayOrigin = rec.p; //slight bias along the normal
+                        vec3 directionToLight = normalize(light->position - shadowRayOrigin);
+                        ray shadowRay(shadowRayOrigin, directionToLight);
+                        if(dot(rec.normal, directionToLight) > 0) {
+                            hit_record shadowRec;
+                            if (world.hit(shadowRay, interval(0, infinity), shadowRec)) {
+                                if (shadowRec.t < (light->position - rec.p).length()) {
+                                    // The hit point is in shadow, return an appropriate shadow color
+                                    continue; 
+                                }
+                            }//
+                        }
                         
-                // Ensure final pixel color is within the valid range [0, 1]
-                pixelColor = clamp(pixelColor, 0.0, 1.0);
-                return color(pixelColor);
+                        //Diffuse:
+                        double diffuseFactor = dot(rec.normal, lightDir); // Diffuse reflection
+                        if (diffuseFactor > 0) {
+                            // Calculate diffuse contribution
+                            vec3 diffuse = light->intensity * rec.bp->diffusecolor * diffuseFactor * rec.bp->kd;
+                            pixelColor += clamp(diffuse, 0.0, 1.0);            
+                        }
+
+                        //Specular:
+                        vec3 viewDir = normalize(cameraPosition - rec.p);
+                        vec3 reflectDir = reflect(-lightDir, rec.normal); // Calculate reflection direction
+                        vec3 halfway = normalize(lightDir + viewDir);
+                        float specularIntensity = pow(max(0.0, dot(rec.normal, halfway)), rec.bp->specularexponent);
+                        vec3 specular = light->intensity * rec.bp->specularcolor * specularIntensity * rec.bp->ks;
+                        pixelColor += clamp(specular, 0.0, 1.0);  
+
+                        //Reflective
+                        if (rec.bp->isreflective && rec.bp->reflectivity > 0.0f) {
+                            vec3 reflectedDir = reflect(r.direction(), rec.normal); 
+                            ray reflectionRay(rec.p, reflectedDir);
+                            double reflectance = rec.bp->reflectivity;
+
+                            // Trace reflection and transmission rays recursively to get colors
+                            color reflectedColor = rayColor(reflectionRay, world, maxDepth - 1);
+                            pixelColor += clamp((reflectedColor * reflectance), 0.0, 1.0);
+                        }
+
+                        //Refractive
+                        if(rec.bp->isrefractive && rec.bp->refractiveindex > 0.0f){
+                            vec3 refractedDir = snell(r.direction(), rec.normal, rec.bp->refractiveindex);
+                            ray transmissionRay(rec.p, refractedDir);
+                            double transmittance = 1.0 - rec.bp->reflectivity;
+                            
+                            color transmittedColor = rayColor(transmissionRay, world, maxDepth - 1);
+                            pixelColor += clamp((transmittedColor * transmittance), 0.0, 1.0);
+                        }
+                    }
+                            
+                    // Ensure final pixel color is within the valid range [0, 1]
+                    pixelColor = clamp(pixelColor, 0.0, 1.0);
+                    return color(pixelColor);
+                }
+                return world.backgroundcolor; // If no object hit, return background color
             }
-            return world.backgroundcolor; // If no object hit, return background color
         }
-        return color(0,0,0);
+        throw std::runtime_error("Error: rendermode must match either binary or phong");
+        return color(0, 0, 0);
     }
 };
 
