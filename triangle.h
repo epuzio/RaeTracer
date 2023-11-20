@@ -51,8 +51,32 @@ class triangle : public shape {
         return true;
     }
 
-    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight){
-      //implement later
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) {
+        // Calculate barycentric coordinates
+        vec3 edge1 = v1 - v0;
+        vec3 edge2 = v2 - v0;
+        vec3 normal = cross(edge1, edge2);
+
+        double area = normal.length() / 2.0f;
+        vec3 edgeVec1 = v1 - point;
+        vec3 edgeVec2 = v2 - point;
+        double alpha = cross(edge2, edgeVec2).length() / (2.0 * area);
+        double beta = cross(edgeVec1, edge1).length() / (2.0 * area);
+        double gamma = 1.0f - alpha - beta;
+
+        // Calculate texture coordinates using barycentric interpolation
+        double u = (alpha * v0.x + beta * v1.x + gamma * v2.x);
+        double v = (alpha * v0.y + beta * v1.y + gamma * v2.y);
+
+        // Normalize texture coordinates to fit within the texture image
+        u /= textureWidth;
+        v /= textureHeight;
+
+        // Map the normalized coordinates to the texture size
+        double textureU = u * textureWidth;
+        double textureV = v * textureHeight;
+
+        return vec3(textureU, textureV, 0.0);
     }
 
   private:
