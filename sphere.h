@@ -33,7 +33,7 @@ class sphere : public shape {
     }
 
      // Function to map a point on the sphere to UV coordinates
-    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const{
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const {
         int u = int((point.x + radius) / (2 * radius) * textureWidth) % textureWidth;
         int v = int((point.y + radius) / (2 * radius) * textureHeight) % textureHeight;
 

@@ -37,7 +37,7 @@
                             "ks":0.1, 
                             "kd":0.9, 
                             "specularexponent":20, 
-                            "diffusecolor":[0.8, 0.5, 0.5],
+                            "diffusecolor":[0.5, 0.8, 0.5],
                             "specularcolor":[1.0,1.0,1.0],
                             "isreflective":false,
                             "reflectivity":1.0,
@@ -46,7 +46,27 @@
                             "hastexture":true,
                             "texturepath":"sample_texture.ppm"
                         } 
-                }  
+                },
+                { 
+                    "type":"triangle", 
+                    "v0": [ -1, 0.5, 2],
+                    "v1": [ 1, 0.3, 2],
+                    "v2": [ 1, -0.2, 0],
+                    "material":
+                        { 
+                            "ks":0.1, 
+                            "kd":0.9, 
+                            "specularexponent":20, 
+                            "diffusecolor":[0.5, 0.8, 0.5],
+                            "specularcolor":[1.0,1.0,1.0],
+                            "isreflective":false,
+                            "reflectivity":1.0,
+                            "isrefractive":false,
+                            "refractiveindex":1.0,
+                            "hastexture":true,
+                            "texturepath":"sample_texture.ppm" 
+                        } 
+                }
             ] 
         } 
 }

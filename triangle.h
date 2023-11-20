@@ -47,37 +47,46 @@ class triangle : public shape {
         rec.set_face_normal(r, normalize(cross(edge1, edge2)));
         rec.p = r.at(t);
         rec.bp = bp;
+        if(bp->hastexture){
+          rec.texturecoordinate = uvmap(rec.p, rec.bp->texture.size(), rec.bp->texture[0].size());
+        }
 
         return true;
     }
 
-    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) { //all gpt
-        // Calculate barycentric coordinates
-        vec3 edge1 = v1 - v0;
-        vec3 edge2 = v2 - v0;
-        vec3 normal = cross(edge1, edge2);
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const { //all gpt
+        // Calculate the vectors representing the edges of the triangle
+      vec3 edge1 = v1 - v0;
+      vec3 edge2 = v2 - v0;
 
-        double area = normal.length() / 2.0f;
-        vec3 edgeVec1 = v1 - point;
-        vec3 edgeVec2 = v2 - point;
-        double alpha = cross(edge2, edgeVec2).length() / (2.0 * area);
-        double beta = cross(edgeVec1, edge1).length() / (2.0 * area);
-        double gamma = 1.0f - alpha - beta;
+      // Calculate the normal of the triangle
+      vec3 normal = normalize(cross(edge1, edge2));
 
-        // Calculate texture coordinates using barycentric interpolation
-        double u = (alpha * v0.x + beta * v1.x + gamma * v2.x);
-        double v = (alpha * v0.y + beta * v1.y + gamma * v2.y);
+      // Calculate the vectors from v0 to the given point
+      vec3 diff = point - v0;
 
-        // Normalize texture coordinates to fit within the texture image
-        u /= textureWidth;
-        v /= textureHeight;
+      // Calculate the dot products to determine the u and v coordinates
+      float u = dot(diff, edge1);
+      float v = dot(diff, edge2);
 
-        // Map the normalized coordinates to the texture size
-        double textureU = u * textureWidth;
-        double textureV = v * textureHeight;
+      // Normalize u and v
+      u /= (edge1).length();
+      v /= (edge2).length();
 
-        return vec3(textureU, textureV, 0.0);
-    }
+      // Map u and v to the range [0, 1]
+      u = (u + 1.0f) / 2.0f;
+      v = (v + 1.0f) / 2.0f;
+
+      // Convert u and v to pixel coordinates based on texture size
+      int pixelU = static_cast<int>(u * textureWidth) % textureWidth;
+      int pixelV = static_cast<int>(v * textureHeight) % textureHeight;
+
+      // // Ensure coordinates are within texture bounds
+      // pixelU = clamp(pixelU, 0, textureWidth - 1);
+      // pixelV = clamp(pixelV, 0, textureHeight - 1);
+
+      return vec3(static_cast<float>(pixelU), static_cast<float>(pixelV), 0.0f);
+  }
 
   private:
     point3 v0;

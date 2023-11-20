@@ -124,7 +124,6 @@ class camera {
                         vec3 ambient = 0.5 * rec.bp->diffusecolor; // Ambient reflection
                         pixelColor = clamp(localContribution*ambient, 0.0, 1.0); // Initialize with ambient light
                     }
-                    
                            
                     // Iterate through each light source in the scene
                     for (const auto& light : world.lights) {
