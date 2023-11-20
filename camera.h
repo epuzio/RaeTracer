@@ -114,6 +114,15 @@ class camera {
                     //Calculate local contribution based on the material's reflectivity
                     double localContribution = (rec.bp->isreflective) ? 1.0 - rec.bp->reflectivity : 1.0; 
 
+                    //Texture:
+                    if(rec.bp->hastexture){
+                        int line = static_cast<int>((y / x) * imageWidth);
+                        
+
+                        //Go to the ppm image whose path corresponds to the material's texturepath
+                        //Get the color whose coordinate is at rec.texturecoordinate.x, rec.texturecoordinate.y
+                    }
+                    
                     //Ambient:
                     vec3 ambient = 0.5 * rec.bp->diffusecolor; // Ambient reflection
                     vec3 pixelColor = clamp(localContribution*ambient, 0.0, 1.0); // Initialize with ambient light

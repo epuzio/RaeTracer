@@ -11,6 +11,7 @@ class hit_record {
     point3 p;
     vec3 normal;
     shared_ptr<material> bp;
+    vec3 texturecoordinate; //where on the 2D texture is the hit point mapped to?
     double t;
     bool front_face;
 
@@ -27,6 +28,7 @@ class shape {
   public:
     virtual ~shape() {};
     virtual bool hit(const ray& r, interval ray_t, hit_record& rec) const = 0;
+    virtual vec3 uvmap(const vec3& point, int textureWidth, int textureHeight);
 };
 
 

@@ -23,11 +23,33 @@ class sphere : public shape {
               rec.p = r.at(rec.t);
               rec.set_face_normal(r, (rec.p - center) / radius);
               rec.bp = bp;
+              if(bp->hastexture){
+                rec.texturecoordinate = uvmap(rec.p, 2000, 2000);
+              }
               return true;
           }
       }
       return false;
     }
+
+    // Function to map a point on the sphere to UV coordinates
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) {
+        double phi, theta;
+        getSphericalCoordinates(normalize(point - center), phi, theta);
+
+        float u = theta / (2.0f * M_PI);
+        float v = phi / M_PI;
+
+        float textureU = u * textureWidth;
+        float textureV = v * textureHeight;
+        return vec3(textureU, textureV, 0.0);
+    }
+
+    void getSphericalCoordinates(const vec3& point, double& phi, double& theta) {
+      phi = atan2(point.z, point.x);
+      theta = acos(point.y / radius);
+    }
+
 
   private:
     point3 center;

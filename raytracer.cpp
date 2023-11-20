@@ -19,6 +19,34 @@
 using json = nlohmann::json;
 using point3 = vec3;
 
+bool readPPM(const char* filename, std::vector<vec3>& image, int& width, int& height) {
+    std::ifstream file(filename, std::ios::binary);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return false;
+    }
+
+    std::string format;
+    file >> format >> width >> height;
+    int maxColorValue;
+    file >> maxColorValue;
+
+    if (format != "P6" || maxColorValue != 255) {
+        std::cerr << "Invalid or unsupported PPM format." << std::endl;
+        return false;
+    }
+
+    // Consume the newline character after maxColorValue
+    file.get();
+
+    image.resize(width * height);
+
+    file.read(reinterpret_cast<char*>(image.data()), width * height * sizeof(vec3));
+
+    file.close();
+    return true;
+}
+
 void setCameraParameters(camera& cam, json input){
     string rendermode = input["rendermode"].get<string>();
     int nbounces = (rendermode == "phong") ? input["nbounces"].get<int>() : 1;
@@ -69,25 +97,54 @@ void setLightParameters(scene&world, json lightsInput){
 
 material setMaterialParameters(scene&world, json s){
     json materialInput = s["material"];
-    return material(
-        materialInput["ks"].get<double>(),
-        materialInput["kd"].get<double>(),
-        materialInput["specularexponent"].get<double>(),
-        color(
-            materialInput["diffusecolor"][0].get<double>(),
-            materialInput["diffusecolor"][1].get<double>(),
-            materialInput["diffusecolor"][2].get<double>()
-        ),
-        color(
-            materialInput["specularcolor"][0].get<double>(),
-            materialInput["specularcolor"][1].get<double>(),
-            materialInput["specularcolor"][2].get<double>()
-        ),
-        materialInput["isreflective"].get<bool>(),
-        materialInput["reflectivity"].get<double>(),
-        materialInput["isrefractive"].get<bool>(),
-        materialInput["refractiveindex"].get<double>()
-    );
+    if (materialInput["hastexture"]) {
+        return material(
+            materialInput["ks"].get<double>(),
+            materialInput["kd"].get<double>(),
+            materialInput["specularexponent"].get<double>(),
+            color(
+                materialInput["diffusecolor"][0].get<double>(),
+                materialInput["diffusecolor"][1].get<double>(),
+                materialInput["diffusecolor"][2].get<double>()
+            ),
+            color(
+                materialInput["specularcolor"][0].get<double>(),
+                materialInput["specularcolor"][1].get<double>(),
+                materialInput["specularcolor"][2].get<double>()
+            ),
+            materialInput["isreflective"].get<bool>(),
+            materialInput["reflectivity"].get<double>(),
+            materialInput["isrefractive"].get<bool>(),
+            materialInput["refractiveindex"].get<double>()
+        );
+    } else {
+        vector<vec3> img;
+        double h;
+        double w;
+        materialInput["texturepath"].get<string>().c_str(), img, w, h;
+        return material(
+            materialInput["ks"].get<double>(),
+            materialInput["kd"].get<double>(),
+            materialInput["specularexponent"].get<double>(),
+            color(
+                materialInput["diffusecolor"][0].get<double>(),
+                materialInput["diffusecolor"][1].get<double>(),
+                materialInput["diffusecolor"][2].get<double>()
+            ),
+            color(
+                materialInput["specularcolor"][0].get<double>(),
+                materialInput["specularcolor"][1].get<double>(),
+                materialInput["specularcolor"][2].get<double>()
+            ),
+            materialInput["isreflective"].get<bool>(),
+            materialInput["reflectivity"].get<double>(),
+            materialInput["isrefractive"].get<bool>(),
+            materialInput["refractiveindex"].get<double>(),
+            materialInput["hastexture"].get<bool>(),
+            img, 
+            vec3(w, h, 0)
+        );
+    }
 }
 
 void setWorldParameters(scene& world, json input){
