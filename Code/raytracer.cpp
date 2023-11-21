@@ -8,7 +8,6 @@
 #include "material.h"
 #include "light.h"
 
-#include "interval.h"
 #include "vec3.h"
 #include "ray.h"
 

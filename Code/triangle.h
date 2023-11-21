@@ -9,7 +9,7 @@ class triangle : public shape {
   public:
     triangle(point3 v0, point3 v1, point3 v2, shared_ptr<material> bp) : v0(v0), v1(v1), v2(v2), bp(bp) {}
 
-    bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
+    bool hit(const ray& r, double ray_min, double ray_max, hit_record& rec) const override {
       //using Watertight Ray/Triangle Intersection:
 
         vec3 edge1 = v1 - v0;
@@ -39,7 +39,7 @@ class triangle : public shape {
 
         float t = dot(edge2, qvec) * inv_det;
 
-        if (t < ray_t.min || t > ray_t.max) {
+        if (t < ray_min || t > ray_max) {
             return false;
         }
 

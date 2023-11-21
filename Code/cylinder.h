@@ -3,7 +3,6 @@
 
 #include "shape.h"
 #include "vec3.h"
-#include "interval.h"
 
 class cylinder : public shape {
   public:
@@ -11,7 +10,7 @@ class cylinder : public shape {
     cylinder(point3 center, vec3 axis, double radius, double height, shared_ptr<material> bp)
         : center(center), axis(axis), radius(radius), height(height), bp(bp){}
 
-    bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
+    bool hit(const ray& r, double ray_min, double ray_max, hit_record& rec) const override {
         vec3 oc = r.origin() - center;
         double a = dot(r.direction(), r.direction()) - dot(r.direction(), axis) * dot(r.direction(), axis);
         double b = 2.0 * (dot(r.direction(), oc) - dot(r.direction(), axis) * dot(oc, axis));
@@ -22,7 +21,7 @@ class cylinder : public shape {
             return false;
 
         double t = (-b - sqrt(discriminant)) / (2.0 * a);
-        if (t < ray_t.min || t > ray_t.max)
+        if (t < ray_min || t > ray_max)
             return false;
 
         point3 p = r.at(t);
@@ -30,13 +29,13 @@ class cylinder : public shape {
 
         // Check intersection with the bottom cap circle
         if (projection < -height) {
-            if (intersectCaps(r, ray_t, rec, false))
+            if (intersectCaps(r, ray_min, ray_max, rec, false))
                 return true;
         }
 
         // Check intersection with the top cap circle
         if (projection > height) {
-            if (intersectCaps(r, ray_t, rec, true))
+            if (intersectCaps(r, ray_min, ray_max, rec, true))
                 return true;
         }
 
@@ -108,12 +107,12 @@ class cylinder : public shape {
     double height;
     shared_ptr<material> bp;
 
-    bool intersectCaps(const ray& r, interval ray_t, hit_record& rec, bool isTopCap) const {
+    bool intersectCaps(const ray& r, double ray_min, double ray_max, hit_record& rec, bool isTopCap) const {
         vec3 normal = isTopCap ? axis : -axis;
         point3 capCenter = isTopCap ? center + axis * height : center - axis * height;
 
         double t = dot((capCenter - r.origin()), (normal)) / dot(r.direction(), (normal));
-        if (t < ray_t.min || t > ray_t.max)
+        if (t < ray_min || t > ray_max)
             return false;
 
         point3 p = r.at(t);

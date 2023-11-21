@@ -8,7 +8,6 @@
 #include "shape.h"
 #include "vec3.h"
 #include "ray.h"
-#include "interval.h"
 
 class material {
   public:

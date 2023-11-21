@@ -101,14 +101,14 @@ class camera {
         } else{
             hit_record rec;
             if(rendermode == "binary"){
-                if(world.hit(r, interval(0, infinity), rec)) { //copilot autofill
+                if(world.hit(r, 0, infinity, rec)) { //copilot autofill
                     return color(1, 0, 0);
                 }
             } 
 
             if(rendermode == "phong"){
                 hit_record rec;
-                if (world.hit(r, interval(0, infinity), rec)) {
+                if (world.hit(r, 0, infinity, rec)) {
 
                     //Calculate local contribution based on the material's reflectivity
                     double localContribution = (rec.bp->isreflective) ? 1.0 - rec.bp->reflectivity : 1.0; 
@@ -152,7 +152,7 @@ class camera {
                         ray shadowRay(shadowRayOrigin, directionToLight);
                         if(dot(rec.normal, directionToLight) > 0) {
                             hit_record shadowRec;
-                            if (world.hit(shadowRay, interval(0, infinity), shadowRec)) {
+                            if (world.hit(shadowRay, 0.0, infinity, shadowRec)) {
                                 if (shadowRec.t < (light->position - rec.p).length()) {
                                     // The hit point is in shadow, return an appropriate shadow color
                                     return color(pixelColor); 
