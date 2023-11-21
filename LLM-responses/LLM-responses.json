@@ -1,0 +1,64 @@
+1. "feature": The feature that was implemented by this LLM response, formatted using the
+numbers from the outline (e.g. for shadows this will be "Basic Raytracer:6"). It is very
+important to match this formatting.
+2. "method": The LLM method used to generate a response (i.e. "chatgpt" or "copilot").
+3. "query": The exact text query used to generate a response (i.e. the input to ChatGPT or
+Copilot chat, or the comment used for Copilot auto-fill).
+4. "response": The exact response of the LLM, directly copied from the source with no changes
+made.
+5. "code": The location of the beginning and end of your final code for this feature, formatted like
+this: "path/to/file.cpp:line_number_start-path/to/file.cpp:" (e.g.
+"code/raytracer.cpp:10-code/raytracer.cpp:25")
+
+"feature": 
+"method": "ChatGPT"
+"query" : 
+"response" :
+"code" : 
+
+{
+    "feature": "Basic Raytracer:2",
+    "method": "Copilot",
+    "query" : {
+        "vec3 render(const shapes_hit& world) const { vec3 rays; // Calculate viewport dimensions",
+        "// Calculate basis vectors for camera orientation //copilot",
+        "//Calculate the vectors across the horizontal and vertical axes of the viewport", 
+        "//Calculate the horizontal and vertical vectors pointing to the next pixel", 
+        "// Calculate location of upper left pixel (starting pixel)",
+        "// calculate pixel color //copilot",
+    },: 
+    "response" :  {"double aspectRatio = static_cast<double>(width) / height;
+                double fovRadians = (fov * M_PI) / 180.0;
+                double viewportHeight = 2.0 * tan(fovRadians/2);
+                double viewportWidth = aspectRatio * viewportHeight;",
+        "forward = (lookAt - cameraPosition).normalized();
+        right = forward.cross(upVector).normalized();
+        up = right.cross(forward).normalized();",
+        "vec3 horizontal = viewportWidth * right;
+        vec3 vertical = viewportHeight * up;",
+        "vec3 horizontalStep = horizontal / width;
+        vec3 verticalStep = vertical / height;",
+        "topLeftPixel = (cameraPosition - (horizontal/2) - (vertical/2)) + (.5*(horizontalStep + verticalStep));",
+        "for (int x = 0; x < width; ++x) {
+            vec3 pixelColor(0.0, 0.0, 0.0); //modified from color pixelColor = (0,0,0)
+            for (int s = 0; s < numSamples; ++s) {
+                double u = (x + random_double()) * pixelWidth - halfWidth;
+                double v = (y + random_double()) * pixelHeight - halfHeight;
+                ray r(cameraPosition, topLeft + u * right - v * up - cameraPosition); 
+                pixelColor += rayColor(r, world);
+            }
+            writeColor(cout, pixelColor, numSamples); //todo: write to image file
+        }
+
+    }"
+    },
+    "code" : "Code/camera.h "
+
+
+    
+
+}
+
+
+
+
