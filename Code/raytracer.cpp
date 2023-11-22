@@ -7,7 +7,7 @@
 #include "cylinder.h"
 #include "material.h"
 #include "light.h"
-#include "BVH.h"
+#include "box.h"
 
 #include "vec3.h"
 #include "ray.h"

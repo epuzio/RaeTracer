@@ -53,6 +53,12 @@ class vec3 {
     static vec3 max(const vec3& a, const vec3& b) {
         return vec3(std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z));
     }
+
+    void swap(vec3& v1, vec3& v2) {
+        std::swap(v1.x, v2.x);
+        std::swap(v1.y, v2.y);
+        std::swap(v1.z, v2.z);
+    }
 };
 
 //vector utility functions: //copilot
