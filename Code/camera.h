@@ -43,8 +43,6 @@ class camera {
         right = normalize(cross(forward, upVector));
         up = normalize(cross(right,forward));
     }
-
-
    
    void render(const scene& world, int maxDepth) {
         outputFile << "P3\n" << width << ' ' << height << "\n255\n"; 
@@ -92,17 +90,21 @@ class camera {
     }
 
 
-
     //GET COLOR OF RAY
     //rayColor function //copilot
     color rayColor(const ray& r, const scene& world, int maxDepth) const {
+        cout << "rc called for " << r.origin() << " " << r.direction() << " md: " << maxDepth << endl;
         if (maxDepth <= 0) {
+            cout << "md = 0" << endl;
             return color(0,0,0);
         } else{
             hit_record rec;
+            cout << "else" << endl;
             if(rendermode == "binary"){
+                cout << "rm = binary" << endl;
                 if(world.hit(r, 0, infinity, rec)) { //copilot autofill
-                    return color(1, 0, 0);
+                    cout << "hit!!" << endl;
+                    return color(1.0, 0.0, 0.0);
                 }
                 return color(0, 0, 0);
             } 

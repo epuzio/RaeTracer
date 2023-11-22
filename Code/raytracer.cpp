@@ -172,8 +172,8 @@ void setWorldParameters(scene& world, json input){
                 0.0,
                 0.0,
                 0.0,
-                color(0.0, 0.0, 0.0),
-                color(0.0, 0.0, 0.0),
+                color(1.0, 0.0, 0.0),
+                color(1.0, 0.0, 0.0),
                 false,
                 0.0,
                 false,
@@ -211,24 +211,24 @@ void setWorldParameters(scene& world, json input){
                 ),
                 mat
             ));
-            // world.add(make_shared<triangle>(
-            //     vec3(
-            //         s["v0"][0].get<double>(),
-            //         s["v0"][1].get<double>(),
-            //         s["v0"][2].get<double>()
-            //     ),
-            //     vec3(
-            //         s["v1"][0].get<double>(),
-            //         s["v1"][1].get<double>(),
-            //         s["v1"][2].get<double>()
-            //     ),
-            //     vec3(
-            //         s["v2"][0].get<double>(),
-            //         s["v2"][1].get<double>(),
-            //         s["v2"][2].get<double>()
-            //     ),
-            //     mat
-            // ));
+            world.add(make_shared<triangle>(
+                vec3(
+                    s["v0"][0].get<double>(),
+                    s["v0"][1].get<double>(),
+                    s["v0"][2].get<double>()
+                ),
+                vec3(
+                    s["v1"][0].get<double>(),
+                    s["v1"][1].get<double>(),
+                    s["v1"][2].get<double>()
+                ),
+                vec3(
+                    s["v2"][0].get<double>(),
+                    s["v2"][1].get<double>(),
+                    s["v2"][2].get<double>()
+                ),
+                mat
+            ));
         }
         if (s["type"] == "cylinder"){
             world.add(make_shared<cylinder>(
@@ -247,11 +247,11 @@ void setWorldParameters(scene& world, json input){
                 mat
             ));
         }
-        if (!triangles.empty()) {
-            auto bvh = make_shared<BVHNode>();
-            bvh->buildBVH(triangles, 3);
-            world.add(bvh);
-        }
+        // if (!triangles.empty()) {
+        //     auto bvh = make_shared<BVHNode>();
+        //     bvh->buildBVH(triangles, 3);
+        //     world.add(bvh);
+        // }
     }
 }
 
