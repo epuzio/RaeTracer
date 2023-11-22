@@ -50,6 +50,7 @@ bool readPPM(const char* filename, std::vector<std::vector<vec3>>& image) {
 void setCameraParameters(camera& cam, json input){
     string rendermode = input["rendermode"].get<string>();
     int nbounces = (rendermode == "phong") ? input["nbounces"].get<int>() : 1;
+
     json cameraInput = input["camera"];
     cam = camera( //gpt for formatting
         nbounces,
@@ -97,6 +98,20 @@ void setLightParameters(scene&world, json lightsInput){
 
 material setMaterialParameters(scene&world, json s){
     json materialInput = s["material"];
+    if(s.find("material") == s.end()){
+        cout << "not there" << endl;
+        return material(
+            0.0,
+            0.0,
+            0.0,
+            color(0.0, 0.0, 0.0),
+            color(0.0, 0.0, 0.0),
+            false,
+            0.0,
+            false,
+            0.0
+        );
+    }
     if (materialInput.find("hastexture") == materialInput.end() || !materialInput["hastexture"].get<bool>()) {
         return material(
             materialInput["ks"].get<double>(),
@@ -235,12 +250,20 @@ void setWorldParameters(scene& world, json input){
     }
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    if(argc != 2){
+        std::cerr << "Please input: " << argv[0] << " relative-path-to/input.json" << std::endl;
+        return 1; // Return indicating an error
+    }
+
+    cout << argv[1] << endl;
+    
     scene world;
     camera cam;
 
     //JSON input
-    ifstream inputFile("Resources/texture.json");
+    std::string filename = argv[1];
+    ifstream inputFile(filename);
     json input;
 
     if (inputFile.is_open()) {
@@ -254,5 +277,5 @@ int main() {
     } else {
         cerr << "Unable to open json file." << endl;
     }
-    cam.render(world, input["nbounces"]);
+    cam.render(world, cam.nbounces);
 };

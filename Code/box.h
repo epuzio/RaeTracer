@@ -68,6 +68,8 @@ class BVHNode : public shape{
             //Call hit on left child, then right child.
             if(leftChild != nullptr){leftChild->hit(r, ray_min, ray_max, rec);}
             if(rightChild != nullptr){rightChild->hit(r, ray_min, ray_max, rec);}
+            
+            return false; //redundant
         }
 
         string longestAxis(const vec3& minPoint, const vec3& maxPoint) {
