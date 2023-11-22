@@ -193,24 +193,24 @@ void setWorldParameters(scene& world, json input){
             ));
         }
         if (s["type"] == "triangle"){
-            triangles.push_back(triangle(
-                vec3(
-                    s["v0"][0].get<double>(),
-                    s["v0"][1].get<double>(),
-                    s["v0"][2].get<double>()
-                ),
-                vec3(
-                    s["v1"][0].get<double>(),
-                    s["v1"][1].get<double>(),
-                    s["v1"][2].get<double>()
-                ),
-                vec3(
-                    s["v2"][0].get<double>(),
-                    s["v2"][1].get<double>(),
-                    s["v2"][2].get<double>()
-                ),
-                mat
-            ));
+            // triangles.push_back(triangle(
+            //     vec3(
+            //         s["v0"][0].get<double>(),
+            //         s["v0"][1].get<double>(),
+            //         s["v0"][2].get<double>()
+            //     ),
+            //     vec3(
+            //         s["v1"][0].get<double>(),
+            //         s["v1"][1].get<double>(),
+            //         s["v1"][2].get<double>()
+            //     ),
+            //     vec3(
+            //         s["v2"][0].get<double>(),
+            //         s["v2"][1].get<double>(),
+            //         s["v2"][2].get<double>()
+            //     ),
+            //     mat
+            // ));
             world.add(make_shared<triangle>(
                 vec3(
                     s["v0"][0].get<double>(),
@@ -260,8 +260,6 @@ int main(int argc, char* argv[]) {
         std::cerr << "Please input: " << argv[0] << " relative-path-to/input.json" << std::endl;
         return 1; // Return indicating an error
     }
-
-    cout << argv[1] << endl;
     
     scene world;
     camera cam;

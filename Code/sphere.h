@@ -9,12 +9,13 @@ class sphere : public shape {
     sphere(point3 c, double r, shared_ptr<material> bp) : center(c), radius(r), bp(bp) {}
 
    bool hit(const ray& r, double ray_min, double ray_max, hit_record& rec) const override {
+    // cout << "sphere hit checked" << endl;
       vec3 oc = r.origin() - center;
       auto a = r.direction().length_squared();
       auto half_b = dot(oc, r.direction());
       auto c = oc.length_squared() - radius * radius;
       auto discriminant = half_b * half_b - a * c;
-
+      
       if (discriminant > 0) {
           auto root = sqrt(discriminant);
           auto temp = (-half_b - root) / a;

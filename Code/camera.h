@@ -44,12 +44,14 @@ class camera {
         up = normalize(cross(right,forward));
     }
    
-   void render(const scene& world, int maxDepth) {
+   void render(const scene& world, int maxDepth) const {
         outputFile << "P3\n" << width << ' ' << height << "\n255\n"; 
+        vec3 rays;
 
         // Calculate viewport dimensions //copilot
         double aspectRatio = static_cast<double>(width) / height;
-        double viewportHeight = tan(fov * 0.5 * M_PI / 180.0) * 2.0;
+        double fovRadians = (fov * M_PI) / 180.0;
+        double viewportHeight = 2.0 * tan(fovRadians/2);
         double viewportWidth = aspectRatio * viewportHeight;
 
         //Calculate the vectors across the horizontal and vertical axes of the viewport //c
@@ -75,8 +77,8 @@ class camera {
                     double jitterpy = (rand() / static_cast<double>(RAND_MAX)) - 0.5; // y offset for anti-aliasing
                     
                     // Calculate sample position within the pixel
-                    double u = x + (jitterpx) / (width - 1);
-                    double v = y + (jitterpy) / (height - 1);
+                    double u = (x + (jitterpx / 2.0)) / (width - 1);
+                    double v = (y + (jitterpy / 2.0)) / (height - 1);
 
                     vec3 samplePixel = topLeftPixel + (u * horizontal) + (v * vertical);
                     vec3 rayDirection = samplePixel - cameraPosition;
@@ -93,17 +95,12 @@ class camera {
     //GET COLOR OF RAY
     //rayColor function //copilot
     color rayColor(const ray& r, const scene& world, int maxDepth) const {
-        cout << "rc called for " << r.origin() << " " << r.direction() << " md: " << maxDepth << endl;
         if (maxDepth <= 0) {
-            cout << "md = 0" << endl;
             return color(0,0,0);
         } else{
             hit_record rec;
-            cout << "else" << endl;
             if(rendermode == "binary"){
-                cout << "rm = binary" << endl;
                 if(world.hit(r, 0, infinity, rec)) { //copilot autofill
-                    cout << "hit!!" << endl;
                     return color(1.0, 0.0, 0.0);
                 }
                 return color(0, 0, 0);
@@ -122,7 +119,7 @@ class camera {
                         pixelColor += rec.bp->texture[(int)rec.texturecoordinate.x][(int)rec.texturecoordinate.y];
                     } else{
                         //Ambient:
-                        vec3 ambient = 0.5 * rec.bp->diffusecolor; // Ambient reflection
+                        vec3 ambient = world.backgroundcolor * rec.bp->diffusecolor; // Ambient reflection
                         pixelColor = clamp(localContribution*ambient, 0.0, 1.0); // Initialize with ambient light
                     }
                            
@@ -157,7 +154,6 @@ class camera {
                             hit_record shadowRec;
                             if (!world.hit(shadowRay, 0.0, infinity, shadowRec)) {
                                 if (shadowRec.t < (light->position - rec.p).length()) {
-
                                      //Diffuse:
                                     double diffuseFactor = dot(rec.normal, lightDir); // Diffuse reflection
                                     if (diffuseFactor > 0) {
@@ -170,7 +166,7 @@ class camera {
                                     vec3 viewDir = normalize(cameraPosition - rec.p);
                                     vec3 halfway = normalize(lightDir + viewDir);
                                     float specularIntensity = pow(max(0.0, dot(rec.normal, halfway)), rec.bp->specularexponent);
-                                    vec3 specular = light->intensity * rec.bp->specularcolor * (specularIntensity*.1) * rec.bp->ks;
+                                    vec3 specular = light->intensity * rec.bp->specularcolor * (specularIntensity) * rec.bp->ks;
                                     float normalLightHalfway = dot(rec.normal, halfway);
                                     if (normalLightHalfway > 0.0) {
                                         // Calculate the specular contribution and add it to the pixel color
@@ -192,7 +188,7 @@ class camera {
 
     private:
         //Write pixel color to output file
-        void writeColor(ostream &out, color pixel_color, int numSamples) {
+        void writeColor(ostream &out, color pixel_color, int numSamples) const{
             pixel_color /= numSamples; //average color
             // Ensure final pixel color is within the valid range [0, 1]
             pixel_color = clamp(pixel_color, 0.0, 1.0);
