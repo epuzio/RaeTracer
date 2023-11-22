@@ -7,6 +7,7 @@
 #include "cylinder.h"
 #include "material.h"
 #include "light.h"
+#include "BVH.h"
 
 #include "vec3.h"
 #include "ray.h"
@@ -144,6 +145,7 @@ material setMaterialParameters(scene&world, json s){
 }
 
 void setWorldParameters(scene& world, json input){
+    vector<triangle> triangles;
     json sceneInput = input["scene"];
     json backgroundInput = sceneInput["backgroundcolor"];
     json lightsInput = sceneInput["lightsources"];
@@ -171,7 +173,7 @@ void setWorldParameters(scene& world, json input){
             ));
         }
         if (s["type"] == "triangle"){
-            world.add(make_shared<triangle>(
+            triangles.push_back(triangle(
                 vec3(
                     s["v0"][0].get<double>(),
                     s["v0"][1].get<double>(),
@@ -189,6 +191,24 @@ void setWorldParameters(scene& world, json input){
                 ),
                 mat
             ));
+            // world.add(make_shared<triangle>(
+            //     vec3(
+            //         s["v0"][0].get<double>(),
+            //         s["v0"][1].get<double>(),
+            //         s["v0"][2].get<double>()
+            //     ),
+            //     vec3(
+            //         s["v1"][0].get<double>(),
+            //         s["v1"][1].get<double>(),
+            //         s["v1"][2].get<double>()
+            //     ),
+            //     vec3(
+            //         s["v2"][0].get<double>(),
+            //         s["v2"][1].get<double>(),
+            //         s["v2"][2].get<double>()
+            //     ),
+            //     mat
+            // ));
         }
         if (s["type"] == "cylinder"){
             world.add(make_shared<cylinder>(
@@ -207,6 +227,8 @@ void setWorldParameters(scene& world, json input){
                 mat
             ));
         }
+        BVHNode* bvh = buildBVH(triangles);
+        world.add(bvh);
     }
 }
 
