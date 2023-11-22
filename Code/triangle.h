@@ -80,11 +80,6 @@ class triangle : public shape {
       // Convert u and v to pixel coordinates based on texture size
       int pixelU = static_cast<int>(u * textureWidth) % textureWidth;
       int pixelV = static_cast<int>(v * textureHeight) % textureHeight;
-
-      // // Ensure coordinates are within texture bounds
-      // pixelU = clamp(pixelU, 0, textureWidth - 1);
-      // pixelV = clamp(pixelV, 0, textureHeight - 1);
-
       return vec3(static_cast<float>(pixelU), static_cast<float>(pixelV), 0.0f);
   }
 

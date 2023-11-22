@@ -62,26 +62,24 @@ class cylinder : public shape {
     }
 
     vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const { //all gpt
-        vec3 toCenter = point - center;
-        vec3 projectionOntoAxis = dot(toCenter, axis) * axis;
-        vec3 perpendicularComponent = toCenter - projectionOntoAxis;
-        
-        // Calculate phi angle based on the circular cross-section around the cylinder
-        double phi = atan2(perpendicularComponent.y, perpendicularComponent.x);
-        if (phi < 0.0)
-            phi += 2.0 * M_PI; // Ensure phi is in the range [0, 2π]
+        // Calculate the cylinder's local coordinates
+        vec3 localCoord = point - center;
 
-        // Map the phi angle to the range of texture coordinates (0, 1)
-        double u = phi / (2.0 * M_PI);
+        // Project the local coordinates onto the cylinder's axis to get the height component
+        float projection = dot(localCoord, axis);
+        float normalizedHeight = projection / height + 0.5; // Normalize the height to [0, 1] range
 
-        // Map the height of the point to the range of texture coordinates (0, 1)
-        double v = (dot(toCenter, axis) + height) / (2.0 * height);
+        // Calculate the angle around the cylinder
+        float angle = atan2(localCoord.y, localCoord.x);
+        if (angle < 0.0) {
+            angle += 2.0 * M_PI; // Ensure the angle is in [0, 2π) range
+        }
 
-        // Map the normalized coordinates to the texture size
-        double textureU = u * textureWidth;
-        double textureV = v * textureHeight;
+        // Map the angle and height to UV coordinates
+        int u = int((angle / (2.0 * M_PI)) * textureWidth) % textureWidth;
+        int v = int(normalizedHeight * textureHeight);
 
-        return vec3(textureU, textureV, 0.0f);
+        return vec3(u, v, 0); // Return the color based on the mapped UV coordinates 
     }
 
     vec3 uvmapCaps(vec3 point, point3 capCenter, int textureWidth, int textureHeight) const {
@@ -111,16 +109,18 @@ class cylinder : public shape {
         vec3 normal = isTopCap ? axis : -axis;
         point3 capCenter = isTopCap ? center + axis * height : center - axis * height;
 
+        // Check if the ray is parallel to the cap
         double t = dot((capCenter - r.origin()), (normal)) / dot(r.direction(), (normal));
         if (t < ray_min || t > ray_max)
             return false;
 
+        // Check if the intersection point is within the cap
         point3 p = r.at(t);
         vec3 toCenter = p - capCenter;
         double distanceSquared = dot(toCenter, toCenter);
         if (distanceSquared <= radius * radius) {
-            vec3 outward_normal = normalize(isTopCap ? axis : -axis);
-            if(dot(r.direction(), outward_normal) < 0){ //i added this line
+            vec3 outward_normal = normalize(isTopCap ? axis : -axis); // Calculate the outward normal based on if the cap is top or bottom
+            if(dot(r.direction(), outward_normal) < 0){ //if the ray is pointing towards the cap
                 rec.set_face_normal(r, outward_normal);
                 rec.t = t;
                 rec.p = p;

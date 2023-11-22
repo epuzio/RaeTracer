@@ -215,7 +215,7 @@ int main() {
     camera cam;
 
     //JSON input
-    ifstream inputFile("texture.json");
+    ifstream inputFile("Resources/texture.json");
     json input;
 
     if (inputFile.is_open()) {
