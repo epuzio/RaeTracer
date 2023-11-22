@@ -44,6 +44,15 @@ class vec3 {
     double length_squared() const {
         return x*x + y*y + z*z; 
     }
+
+    //overload min and max for vec3
+    static vec3 min(const vec3& a, const vec3& b) {
+        return vec3(std::min(a.x, b.x), std::min(a.y, b.y), std::min(a.z, b.z));
+    }
+
+    static vec3 max(const vec3& a, const vec3& b) {
+        return vec3(std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z));
+    }
 };
 
 //vector utility functions: //copilot

@@ -179,9 +179,6 @@ class camera {
                             }//
                         }             
                     }
-                            
-                    // Ensure final pixel color is within the valid range [0, 1]
-                    pixelColor = clamp(pixelColor, 0.0, 1.0);
                     return color(pixelColor);
                 }
                 return world.backgroundcolor; // If no object hit, return background color
@@ -195,6 +192,8 @@ class camera {
         //Write pixel color to output file
         void writeColor(ostream &out, color pixel_color, int numSamples) {
             pixel_color /= numSamples; //average color
+            // Ensure final pixel color is within the valid range [0, 1]
+            pixel_color = clamp(pixel_color, 0.0, 1.0);
             out << static_cast<int>(256 * pixel_color.x) << ' '
                 << static_cast<int>(256 * pixel_color.y) << ' '
                 << static_cast<int>(256 * pixel_color.z) << '\n';

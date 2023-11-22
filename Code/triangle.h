@@ -82,6 +82,18 @@ class triangle : public shape {
       int pixelV = static_cast<int>(v * textureHeight) % textureHeight;
       return vec3(static_cast<float>(pixelU), static_cast<float>(pixelV), 0.0f);
   }
+  
+  vec3 triangleMin(){
+    return vec3(min(min(v0, v1), v2));
+  }
+
+  vec3 triangleMax(){
+    return vec3(max(max(v0, v1), v2));
+  }
+
+  vec3 centroid() const { //added by copilot
+    return (v0 + v1 + v2) / 3;
+  }
 
   private:
     point3 v0;
