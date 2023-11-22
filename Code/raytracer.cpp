@@ -227,8 +227,11 @@ void setWorldParameters(scene& world, json input){
                 mat
             ));
         }
-        BVHNode* bvh = buildBVH(triangles);
-        world.add(bvh);
+        if (!triangles.empty()) {
+            auto bvh = make_shared<BVHNode>();
+            bvh->buildBVH(triangles, 3);
+            world.add(bvh);
+        }
     }
 }
 

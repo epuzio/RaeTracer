@@ -38,11 +38,28 @@ class vec3 {
     vec3& operator/=(const double t) {
         return *this *= 1/t; 
     }
+    
     double length() const {
         return sqrt(length_squared()); 
     }
     double length_squared() const {
         return x*x + y*y + z*z; 
+    }
+
+    bool operator<(const vec3& other) const {
+        return length_squared() < other.length_squared();
+    }
+
+    bool operator<=(const vec3& other) const {
+        return length_squared() <= other.length_squared();
+    }
+
+    bool operator>(const vec3& other) const {
+        return length_squared() > other.length_squared();
+    }
+
+    bool operator>=(const vec3& other) const {
+        return length_squared() >= other.length_squared();
     }
 
     //overload min and max for vec3

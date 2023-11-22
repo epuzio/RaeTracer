@@ -84,11 +84,11 @@ class triangle : public shape {
   }
   
   vec3 triangleMin(){
-    return vec3(min(min(v0, v1), v2));
+    return vec3(vec3::min(vec3::min(v0, v1), v2));
   }
 
   vec3 triangleMax(){
-    return vec3(max(max(v0, v1), v2));
+    return vec3(vec3::max(vec3::max(v0, v1), v2));
   }
 
   vec3 centroid() const { //added by copilot
