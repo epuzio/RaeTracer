@@ -17,6 +17,7 @@
 #include <fstream>
 using json = nlohmann::json;
 using point3 = vec3;
+int nbounces;
 
 bool readPPM(const char* filename, std::vector<std::vector<vec3>>& image) {
     std::ifstream file(filename);
@@ -49,7 +50,7 @@ bool readPPM(const char* filename, std::vector<std::vector<vec3>>& image) {
 
 void setCameraParameters(camera& cam, json input){
     string rendermode = input["rendermode"].get<string>();
-    int nbounces = (rendermode == "phong") ? input["nbounces"].get<int>() : 1;
+    nbounces = (rendermode == "phong") ? input["nbounces"].get<int>() : 1;
 
     json cameraInput = input["camera"];
     cam = camera( //gpt for formatting
@@ -98,20 +99,6 @@ void setLightParameters(scene&world, json lightsInput){
 
 material setMaterialParameters(scene&world, json s){
     json materialInput = s["material"];
-    if(s.find("material") == s.end()){
-        cout << "not there" << endl;
-        return material(
-            0.0,
-            0.0,
-            0.0,
-            color(0.0, 0.0, 0.0),
-            color(0.0, 0.0, 0.0),
-            false,
-            0.0,
-            false,
-            0.0
-        );
-    }
     if (materialInput.find("hastexture") == materialInput.end() || !materialInput["hastexture"].get<bool>()) {
         return material(
             materialInput["ks"].get<double>(),
@@ -162,6 +149,8 @@ material setMaterialParameters(scene&world, json s){
 void setWorldParameters(scene& world, json input){
     vector<triangle> triangles;
     json sceneInput = input["scene"];
+    string rendermode = input["rendermode"].get<string>();
+
     json backgroundInput = sceneInput["backgroundcolor"];
     json lightsInput = sceneInput["lightsources"];
     json shapesInput = sceneInput["shapes"];
@@ -169,12 +158,28 @@ void setWorldParameters(scene& world, json input){
     //Set background color from JSON input:
     world.backgroundcolor = color((backgroundInput[0]).get<double>(), backgroundInput[1].get<double>(), backgroundInput[2].get<double>());
 
-    //Set lights from JSON input:
-    setLightParameters(world, lightsInput);
+    if(rendermode == "phong"){
+        //Set lights from JSON input:
+        setLightParameters(world, lightsInput);
+    }
 
     //Push shapes from JSON input: (and materials (to-do))
     for (const auto& s : shapesInput) {
-        shared_ptr<material> mat = make_shared<material>(setMaterialParameters(world, s));
+        shared_ptr<material> mat;
+        if(rendermode == "phong"){mat = make_shared<material>(setMaterialParameters(world, s));}
+        else{
+            mat = make_shared<material>(
+                0.0,
+                0.0,
+                0.0,
+                color(0.0, 0.0, 0.0),
+                color(0.0, 0.0, 0.0),
+                false,
+                0.0,
+                false,
+                0.0
+            );
+        }
 
         if (s["type"] == "sphere"){
             world.add(make_shared<sphere>(
@@ -262,20 +267,21 @@ int main(int argc, char* argv[]) {
     camera cam;
 
     //JSON input
-    std::string filename = argv[1];
+    string filename = argv[1];
     ifstream inputFile(filename);
     json input;
 
     if (inputFile.is_open()) {
         try {
             inputFile >> input; // Parse JSON from file
-            setCameraParameters(cam, input);
+            setCameraParameters(cam, input); //setting the  camera
             setWorldParameters(world, input);
+            cam.render(world, nbounces);
         } catch (json::parse_error& e) {
             cerr << "Parse error: " << e.what() << endl;
         }
     } else {
         cerr << "Unable to open json file." << endl;
     }
-    cam.render(world, cam.nbounces);
+    
 };

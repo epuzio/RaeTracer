@@ -13,7 +13,7 @@
 #include <cstdlib>
 
 using namespace std;
-std::ofstream outputFile("img.ppm"); //move this somewhere better
+std::ofstream outputFile("output.ppm"); //move this somewhere better
 
 class camera {
   public:
@@ -37,7 +37,7 @@ class camera {
 
     camera() {}
     camera(double b, string rm, int w, int h, const vec3& pos, const vec3& look, const vec3& upVec, double fieldOfView, double exp)
-        : nbounces(b), rendermode(rm), width(w), height(h), cameraPosition(pos), lookAt(look), upVector(upVec), fov(fieldOfView), exposure(exp) {
+        : nbounces(b), rendermode(rm), width(w), height(h), cameraPosition(pos), lookAt(look), upVector(upVec), fov(fieldOfView), exposure(exp){
         // Calculate basis vectors for camera orientation //copilot (modified)
         forward = normalize(lookAt - cameraPosition);
         right = normalize(cross(forward, upVector));
