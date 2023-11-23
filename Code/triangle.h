@@ -54,33 +54,29 @@ class triangle : public shape {
         return true;
     }
 
-    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const { //all gpt
-        // Calculate the vectors representing the edges of the triangle
-      vec3 edge1 = v1 - v0;
-      vec3 edge2 = v2 - v0;
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const { //all copilot
+        // Calculate the triangle's local coordinates
+        vec3 localCoord = point - v0;
 
-      // Calculate the normal of the triangle
-      vec3 normal = normalize(cross(edge1, edge2));
+        // Calculate the triangle's normal
+        vec3 normal = normalize(cross(v1 - v0, v2 - v0));
 
-      // Calculate the vectors from v0 to the given point
-      vec3 diff = point - v0;
+        // Calculate the triangle's tangent
+        vec3 tangent = normalize(v1 - v0);
 
-      // Calculate the dot products to determine the u and v coordinates
-      float u = dot(diff, edge1);
-      float v = dot(diff, edge2);
+        // Calculate the triangle's bitangent
+        vec3 bitangent = normalize(cross(normal, tangent));
 
-      // Normalize u and v
-      u /= (edge1).length();
-      v /= (edge2).length();
+        // Calculate the triangle's UV coordinates
+        double u = dot(localCoord, tangent);
+        double v = dot(localCoord, bitangent);
 
-      // Map u and v to the range [0, 1]
-      u = (u + 1.0f) / 2.0f;
-      v = (v + 1.0f) / 2.0f;
+        // Map the UV coordinates to the texture coordinates
+        int textureX = (int)(u * textureWidth);
+        int textureY = (int)(v * textureHeight);
 
-      // Convert u and v to pixel coordinates based on texture size
-      int pixelU = static_cast<int>(u * textureWidth) % textureWidth;
-      int pixelV = static_cast<int>(v * textureHeight) % textureHeight;
-      return vec3(static_cast<float>(pixelU), static_cast<float>(pixelV), 0.0f);
+        // Return the texture coordinates
+        return vec3(textureX, textureY, 0);
   }
   
   vec3 triangleMin(){

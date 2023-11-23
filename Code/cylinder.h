@@ -16,39 +16,24 @@ class cylinder : public shape {
         double b = 2.0 * (dot(r.direction(), oc) - dot(r.direction(), axis) * dot(oc, axis));
         double c = dot(oc, oc) - dot(oc, axis) * dot(oc, axis) - radius * radius;
         double discriminant = b * b - 4 * a * c;
+        
 
         if (discriminant < 0)
             return false;
 
         double t = (-b - sqrt(discriminant)) / (2.0 * a);
+        double currentT = t;
+
         if (t < ray_min || t > ray_max)
             return false;
 
         point3 p = r.at(t);
         double projection = dot(p - center, axis);
 
-        // Check intersection with the bottom cap circle
-        if (projection < -height) {
-            if (intersectCaps(r, ray_min, ray_max, rec, false))
-                return true;
-        }
-
-        // Check intersection with the top cap circle
-        if (projection > height) {
-            if (intersectCaps(r, ray_min, ray_max, rec, true))
-                return true;
-        }
-
         // Check intersection with the cylindrical body
         if (projection >= -height && projection <= height) {
-            vec3 toCenter = p - center; // Vector from the cylinder center to the intersection point
-            // Project 'toCenter' onto the cylinder's axis to find the projection vector
-            vec3 projectionOntoAxis = dot(toCenter, axis) * axis;
-            // Calculate the normal vector by subtracting the projection vector from 'toCenter'
-            vec3 perpendicularComponent = toCenter - projectionOntoAxis;
-            // Calculate the outward normal using the perpendicular component
-            vec3 outward_normal = normalize(perpendicularComponent);
-
+            vec3 diff = p - center - projection * axis;
+            vec3 outward_normal = normalize(diff - dot(diff, axis) * axis / (height * height));
             rec.set_face_normal(r, outward_normal);
             rec.t = t;
             rec.p = p;
@@ -56,30 +41,41 @@ class cylinder : public shape {
             if(bp->hastexture){
                 rec.texturecoordinate = uvmap(rec.p, rec.bp->texture.size(), rec.bp->texture[0].size());
             }
-            return true;
+            currentT = t;
+        }
+
+        // Check intersection with the bottom cap circle
+        if (projection < -height) {
+            if (intersectCaps(r, ray_min, ray_max, rec, false, currentT)){
+                if (projection > height) {
+                    if (intersectCaps(r, ray_min, ray_max, rec, true, currentT)){
+                        return true;
+                    }
+                }
+                return true;
+            }
         }
         return false;
     }
 
-    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const { //all gpt
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const { //all copilot
         // Calculate the cylinder's local coordinates
         vec3 localCoord = point - center;
 
-        // Project the local coordinates onto the cylinder's axis to get the height component
-        float projection = dot(localCoord, axis);
-        float normalizedHeight = projection / height + 0.5; // Normalize the height to [0, 1] range
+        // Calculate the cylindrical coordinates
+        double theta = atan2(localCoord.y, localCoord.x); // Angle from the x-axis
+        double radius = sqrt(localCoord.x * localCoord.x + localCoord.y * localCoord.y); // Distance from the origin
 
-        // Calculate the angle around the cylinder
-        float angle = atan2(localCoord.y, localCoord.x);
-        if (angle < 0.0) {
-            angle += 2.0 * M_PI; // Ensure the angle is in [0, 2π) range
-        }
+        // Map the cylindrical coordinates to the UV coordinates
+        double u = (theta + M_PI) / (2 * M_PI); // Normalize theta to [0, 1]
+        double v = localCoord.z / height; // Normalize radius to [0, 1] based on cylinder's height
 
-        // Map the angle and height to UV coordinates
-        int u = int((angle / (2.0 * M_PI)) * textureWidth) % textureWidth;
-        int v = int(normalizedHeight * textureHeight);
+        // Map the UV coordinates to the texture coordinates
+        int textureX = (int)(u * textureWidth);
+        int textureY = (int)(v * textureHeight);
 
-        return vec3(u, v, 0); // Return the color based on the mapped UV coordinates 
+        // Return the texture coordinates
+        return vec3(textureX, textureY, 0);
     }
 
     vec3 uvmapCaps(vec3 point, point3 capCenter, int textureWidth, int textureHeight) const {
@@ -105,7 +101,7 @@ class cylinder : public shape {
     double height;
     shared_ptr<material> bp;
 
-    bool intersectCaps(const ray& r, double ray_min, double ray_max, hit_record& rec, bool isTopCap) const {
+    bool intersectCaps(const ray& r, double ray_min, double ray_max, hit_record& rec, bool isTopCap, double& currentT) const {
         vec3 normal = isTopCap ? axis : -axis;
         point3 capCenter = isTopCap ? center + axis * height : center - axis * height;
 
@@ -121,14 +117,17 @@ class cylinder : public shape {
         if (distanceSquared <= radius * radius) {
             vec3 outward_normal = normalize(isTopCap ? axis : -axis); // Calculate the outward normal based on if the cap is top or bottom
             if(dot(r.direction(), outward_normal) < 0){ //if the ray is pointing towards the cap
-                rec.set_face_normal(r, outward_normal);
-                rec.t = t;
-                rec.p = p;
-                rec.bp = bp;
-                if(bp->hastexture){
-                    rec.texturecoordinate = uvmapCaps(rec.p, capCenter, rec.bp->texture.size(), rec.bp->texture[0].size());
+                if(currentT < t){ //if the cap is closer than the body
+                    rec.set_face_normal(r, outward_normal);
+                    rec.t = t;
+                    rec.p = p;
+                    rec.bp = bp;
+                    if(bp->hastexture){
+                        rec.texturecoordinate = uvmapCaps(rec.p, capCenter, rec.bp->texture.size(), rec.bp->texture[0].size());
+                    }
+                    return true;
                 }
-                return true;
+                
             }
         }
 

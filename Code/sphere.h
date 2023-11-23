@@ -33,12 +33,25 @@ class sphere : public shape {
       return false;
     }
 
-     // Function to map a point on the sphere to UV coordinates
-    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const {
-        int u = textureWidth - (int((point.y + radius) / (2 * radius) * textureWidth) % textureWidth);
-        int v = textureHeight - (int((point.x + radius) / (2 * radius) * textureHeight) % textureHeight);
+     // Function to map a point on the sphere to UV coordinates 
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const { //all copilot
+        // Calculate the sphere's local coordinates
+        vec3 localCoord = point - center;
 
-        return vec3(u, v, 0); // Return the color based on the mapped UV coordinates 
+        // Calculate the spherical coordinates
+        double theta = acos(localCoord.y / radius);
+        double phi = atan2(localCoord.x, localCoord.z);
+
+        // Map the spherical coordinates to the UV coordinates
+        double u = (phi + M_PI) / (2 * M_PI);
+        double v = 1 - theta / M_PI;
+
+        // Map the UV coordinates to the texture coordinates
+        int textureX = (int)(u * textureWidth);
+        int textureY = (int)(v * textureHeight);
+
+        // Return the texture coordinates
+        return vec3(textureX, textureY, 0);
     }
 
   private:

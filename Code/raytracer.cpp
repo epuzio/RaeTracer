@@ -193,24 +193,6 @@ void setWorldParameters(scene& world, json input){
             ));
         }
         if (s["type"] == "triangle"){
-            // triangles.push_back(triangle(
-            //     vec3(
-            //         s["v0"][0].get<double>(),
-            //         s["v0"][1].get<double>(),
-            //         s["v0"][2].get<double>()
-            //     ),
-            //     vec3(
-            //         s["v1"][0].get<double>(),
-            //         s["v1"][1].get<double>(),
-            //         s["v1"][2].get<double>()
-            //     ),
-            //     vec3(
-            //         s["v2"][0].get<double>(),
-            //         s["v2"][1].get<double>(),
-            //         s["v2"][2].get<double>()
-            //     ),
-            //     mat
-            // ));
             world.add(make_shared<triangle>(
                 vec3(
                     s["v0"][0].get<double>(),
@@ -247,11 +229,6 @@ void setWorldParameters(scene& world, json input){
                 mat
             ));
         }
-        // if (!triangles.empty()) {
-        //     auto bvh = make_shared<BVHNode>();
-        //     bvh->buildBVH(triangles, 3);
-        //     world.add(bvh);
-        // }
     }
 }
 
