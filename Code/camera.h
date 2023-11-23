@@ -125,12 +125,11 @@ class camera {
                            
                     // Iterate through each light source in the scene
                     for (const auto& light : world.lights) {
-                        //Reflective
-                        if (rec.bp->isreflective && rec.bp->reflectivity > 0.0f) {
-                            vec3 reflectedDir = reflect(r.direction(), rec.normal); 
+                        //Add reflective contribution:
+                        if(rec.bp->isreflective){
+                            vec3 reflectedDir = reflect(r.direction(), rec.normal);
                             vec3 reflectionRayOrigin = rec.p + (rec.normal * bias); //slight bias along the normal
                             ray reflectionRay(reflectionRayOrigin, reflectedDir);
-                            // Trace reflection and transmission rays recursively to get colors
                             color reflectedColor = rayColor(reflectionRay, world, maxDepth - 1);
                             pixelColor += clamp((reflectedColor * rec.bp->reflectivity), 0.0, 1.0);
                         }
@@ -144,6 +143,7 @@ class camera {
                             color transmittedColor = rayColor(transmissionRay, world, maxDepth - 1);
                             pixelColor += clamp((transmittedColor * transmittance), 0.0, 1.0);
                         }
+
                         // Shadow Calculation - don't calculate Diffuse or Specular if in shadow
                         vec3 lightDir = normalize(light->position - rec.p);
                         vec3 shadowRayOrigin = rec.p + (rec.normal * bias); //slight bias along the normal
