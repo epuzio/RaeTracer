@@ -10,8 +10,6 @@ class triangle : public shape {
     triangle(point3 v0, point3 v1, point3 v2, shared_ptr<material> bp) : v0(v0), v1(v1), v2(v2), bp(bp) {}
 
     bool hit(const ray& r, double ray_min, double ray_max, hit_record& rec) const override {
-      //using Watertight Ray/Triangle Intersection:
-
         vec3 edge1 = v1 - v0;
         vec3 edge2 = v2 - v0;
 
@@ -54,7 +52,8 @@ class triangle : public shape {
         return true;
     }
 
-    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const { //all copilot
+    //Function to map a point on the triangle to UV coordinates
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const {
         // Calculate the triangle's local coordinates
         vec3 localCoord = point - v0;
 

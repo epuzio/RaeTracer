@@ -13,7 +13,7 @@
 #include <cstdlib>
 
 using namespace std;
-std::ofstream outputFile("output.ppm"); //move this somewhere better
+std::ofstream outputFile("output.ppm");
 
 class camera {
   public:
@@ -100,7 +100,7 @@ class camera {
         } else{
             hit_record rec;
             if(rendermode == "binary"){
-                if(world.hit(r, 0, infinity, rec)) { //copilot autofill
+                if(world.hit(r, 0, infinity, rec)) {
                     return color(1.0, 0.0, 0.0);
                 }
                 return color(0, 0, 0);
@@ -118,7 +118,7 @@ class camera {
                     if(rec.bp->hastexture){
                         pixelColor += rec.bp->texture[(int)rec.texturecoordinate.x][(int)rec.texturecoordinate.y];
                     } else{
-                        //Ambient:
+                        // Ambient:
                         vec3 ambient = 0.6 * rec.bp->diffusecolor; // Ambient reflection
                         pixelColor = clamp(localContribution*ambient, 0.0, 1.0); // Initialize with ambient light
                     }
@@ -144,18 +144,16 @@ class camera {
                             color transmittedColor = rayColor(transmissionRay, world, maxDepth - 1);
                             pixelColor += clamp((transmittedColor * transmittance), 0.0, 1.0);
                         }
-                         // Shadow Calculation - don't calculate Diffuse or Specular if in shadow
+                        // Shadow Calculation - don't calculate Diffuse or Specular if in shadow
                         vec3 lightDir = normalize(light->position - rec.p);
                         vec3 shadowRayOrigin = rec.p + (rec.normal * bias); //slight bias along the normal
                         vec3 directionToLight = normalize(light->position - shadowRayOrigin);
                         ray shadowRay(shadowRayOrigin, directionToLight);
                         if(dot(rec.normal, directionToLight) > 0) {
                             hit_record shadowRec;
-                            if (world.hit(shadowRay, 0, infinity, shadowRec)) {
-                                if (shadowRec.t < (light->position - rec.p).length()) {
-                                    // The hit point is in shadow, return an appropriate shadow color
-                                    return color(pixelColor); 
-                                }
+                            if (world.hit(shadowRay, 0, (light->position - rec.p).length(), shadowRec)) {
+                                // The hit point is in shadow, return an appropriate shadow color
+                                return color(pixelColor); 
                             }//
                         }
                         
@@ -163,7 +161,7 @@ class camera {
                         double diffuseFactor = dot(rec.normal, lightDir); // Diffuse reflection
                         if (diffuseFactor > 0) {
                             // Calculate diffuse contribution
-                            vec3 diffuse = light->intensity * rec.bp->diffusecolor * diffuseFactor * rec.bp->kd;
+                            vec3 diffuse = light->intensity * rec.bp->diffusecolor * diffuseFactor*1.1 * rec.bp->kd;
                             pixelColor += clamp(localContribution*diffuse, 0.0, 1.0);            
                         }
 
@@ -202,6 +200,4 @@ class camera {
                 << static_cast<int>(256 * pixel_color.z) << '\n';
         }
 };
-
-// pixel_color = (pow(pixel_color.x, 1/2.2) * 0.2126) + (pow(pixel_color.y, 1/2.2) * 0.7152) + (pow(pixel_color.z, 1/2.2) * 0.0722); //gamma correction
 #endif

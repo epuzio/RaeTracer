@@ -55,24 +55,27 @@ class cylinder : public shape {
         return false;
     }
 
-    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const { //all copilot
+    // Function to map a point on the cylinder body to UV coordinates
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const {
         // Calculate the cylinder's local coordinates
         vec3 localCoord = point - center;
 
-        // Calculate the cylindrical coordinates
-        double theta = atan2(localCoord.y, localCoord.x); // Angle from the x-axis
+        // Calculate the cylinder's normal
+        vec3 normal = normalize(localCoord - dot(localCoord, axis) * axis);
+
+        // Calculate the cylinder's polar coordinates
+        double theta = atan2(normal.y, normal.x); // Angle from the x-axis
         double radius = sqrt(localCoord.x * localCoord.x + localCoord.y * localCoord.y); // Distance from the origin
 
-        // Map the cylindrical coordinates to the UV coordinates
-        double u = (theta + M_PI) / (2 * M_PI); // Normalize theta to [0, 1]
-        double v = localCoord.z / height; // Normalize radius to [0, 1] based on cylinder's height
+        // Map the polar coordinates to the UV space
+        double u = (theta + pi) / (2 * pi); // Normalize theta to [0, 1]
+        double v = (localCoord.z + height) / (2 * height); // Normalize radius to [0, 1] based on cylinder's height
 
-        // Map the UV coordinates to the texture coordinates
-        int textureX = (int)(u * textureWidth);
-        int textureY = (int)(v * textureHeight);
+        // Map normalized coordinates to texture space
+        int texU = static_cast<int>(u * textureWidth) % textureWidth;
+        int texV = static_cast<int>(v * textureHeight) % textureHeight;
 
-        // Return the texture coordinates
-        return vec3(textureX, textureY, 0);
+        return vec3(texU, texV, 0);
     }
 
     vec3 uvmapCaps(vec3 point, point3 capCenter, int textureWidth, int textureHeight) const {

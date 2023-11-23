@@ -9,7 +9,6 @@ class sphere : public shape {
     sphere(point3 c, double r, shared_ptr<material> bp) : center(c), radius(r), bp(bp) {}
 
    bool hit(const ray& r, double ray_min, double ray_max, hit_record& rec) const override {
-    // cout << "sphere hit checked" << endl;
       vec3 oc = r.origin() - center;
       auto a = r.direction().length_squared();
       auto half_b = dot(oc, r.direction());
@@ -34,7 +33,7 @@ class sphere : public shape {
     }
 
      // Function to map a point on the sphere to UV coordinates 
-    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const { //all copilot
+    vec3 uvmap(const vec3& point, int textureWidth, int textureHeight) const {
         // Calculate the sphere's local coordinates
         vec3 localCoord = point - center;
 
