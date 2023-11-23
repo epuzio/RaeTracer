@@ -16,14 +16,11 @@ class cylinder : public shape {
         double b = 2.0 * (dot(r.direction(), oc) - dot(r.direction(), axis) * dot(oc, axis));
         double c = dot(oc, oc) - dot(oc, axis) * dot(oc, axis) - radius * radius;
         double discriminant = b * b - 4 * a * c;
-        
 
         if (discriminant < 0)
             return false;
 
         double t = (-b - sqrt(discriminant)) / (2.0 * a);
-        double currentT = t;
-
         if (t < ray_min || t > ray_max)
             return false;
 
@@ -38,23 +35,23 @@ class cylinder : public shape {
             rec.t = t;
             rec.p = p;
             rec.bp = bp;
-            if(bp->hastexture){
-                rec.texturecoordinate = uvmap(rec.p, rec.bp->texture.size(), rec.bp->texture[0].size());
-            }
-            currentT = t;
+            return true;
         }
 
         // Check intersection with the bottom cap circle
         if (projection < -height) {
-            if (intersectCaps(r, ray_min, ray_max, rec, false, currentT)){
-                if (projection > height) {
-                    if (intersectCaps(r, ray_min, ray_max, rec, true, currentT)){
-                        return true;
-                    }
-                }
+            if (intersectCaps(r, ray_min, ray_max, rec, false))
                 return true;
-            }
         }
+
+        // Check intersection with the top cap circle
+        if (projection > height) {
+            if (intersectCaps(r, ray_min, ray_max, rec, true))
+                return true;
+        }
+
+        
+                    
         return false;
     }
 
@@ -101,7 +98,7 @@ class cylinder : public shape {
     double height;
     shared_ptr<material> bp;
 
-    bool intersectCaps(const ray& r, double ray_min, double ray_max, hit_record& rec, bool isTopCap, double& currentT) const {
+    bool intersectCaps(const ray& r, double ray_min, double ray_max, hit_record& rec, bool isTopCap) const {
         vec3 normal = isTopCap ? axis : -axis;
         point3 capCenter = isTopCap ? center + axis * height : center - axis * height;
 
@@ -117,17 +114,14 @@ class cylinder : public shape {
         if (distanceSquared <= radius * radius) {
             vec3 outward_normal = normalize(isTopCap ? axis : -axis); // Calculate the outward normal based on if the cap is top or bottom
             if(dot(r.direction(), outward_normal) < 0){ //if the ray is pointing towards the cap
-                if(currentT < t){ //if the cap is closer than the body
-                    rec.set_face_normal(r, outward_normal);
-                    rec.t = t;
-                    rec.p = p;
-                    rec.bp = bp;
-                    if(bp->hastexture){
-                        rec.texturecoordinate = uvmapCaps(rec.p, capCenter, rec.bp->texture.size(), rec.bp->texture[0].size());
-                    }
-                    return true;
+                rec.set_face_normal(r, outward_normal);
+                rec.t = t;
+                rec.p = p;
+                rec.bp = bp;
+                if(bp->hastexture){
+                    rec.texturecoordinate = uvmapCaps(rec.p, capCenter, rec.bp->texture.size(), rec.bp->texture[0].size());
                 }
-                
+                return true;
             }
         }
 
