@@ -72,8 +72,8 @@ class triangle : public shape {
         double v = dot(localCoord, bitangent);
 
         // Map the UV coordinates to the texture coordinates
-        int textureX = (int)(u * textureWidth);
-        int textureY = (int)(v * textureHeight);
+        int textureX = (int)(u * textureWidth) % textureWidth;
+        int textureY = (int)(v * textureHeight) % textureHeight;
 
         // Return the texture coordinates
         return vec3(textureX, textureY, 0);

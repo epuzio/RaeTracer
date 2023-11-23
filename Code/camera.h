@@ -31,7 +31,7 @@ class camera {
     double exposure;
     
     //not from JSON input:
-    int numSamples = 5; //to prevent aliasing
+    int numSamples = 3; //to prevent aliasing
     double bias = 0.001; //to prevent shadow acne
     vec3 right, up, forward; //basis vectors for camera cameraPosition
 
@@ -144,7 +144,6 @@ class camera {
                             color transmittedColor = rayColor(transmissionRay, world, maxDepth - 1);
                             pixelColor += clamp((transmittedColor * transmittance), 0.0, 1.0);
                         }
-
                          // Shadow Calculation - don't calculate Diffuse or Specular if in shadow
                         vec3 lightDir = normalize(light->position - rec.p);
                         vec3 shadowRayOrigin = rec.p + (rec.normal * bias); //slight bias along the normal
