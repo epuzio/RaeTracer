@@ -165,63 +165,8 @@ vec3 snell(const vec3 &incident, const vec3 &normal, double refractiveIndex) {
     return refractiveIndex * incident + (refractiveIndex * cosI - cosT) * normal;
 }
 
-//add aliases for vec3 //copilot
+//add aliases for vec3
 using point3 = vec3; // 3D point
 using color = vec3 ; // RGB color
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//original copilot:
-// vector utility functions: //copilot
-// inline ostream& operator<<(ostream &out, const vec3 &v) {
-//     return out << v.x[0] << ' ' << v.y[1] << ' ' << v.z[2];
-// }
-// inline vec3 operator+(const vec3 &u, const vec3 &v) {
-//     return vec3(u.x[0] + v.x[0], u.y[1] + v.y[1], u.z[2] + v.z[2]); 
-// }
-// inline vec3 operator-(const vec3 &u, const vec3 &v) {
-//     return vec3(u.x[0] - v.x[0], u.y[1] - v.y[1], u.z[2] - v.z[2]); 
-// }
-// inline vec3 operator*(const vec3 &u, const vec3 &v) {
-//     return vec3(u.x[0] * v.x[0], u.y[1] * v.y[1], u.z[2] * v.z[2]); 
-// }
-// inline vec3 operator*(double t, const vec3 &v) {
-//     return vec3(t*v.x[0], t*v.y[1], t*v.z[2]); 
-// }
-// inline vec3 operator*(const vec3 &v, double t) {
-//     return t * v; 
-// }
-// inline vec3 operator/(vec3 v, double t) {
-//     return (1/t) * v; 
-// }
-// inline double dot(const vec3 &u, const vec3 &v) {
-//     return u.x[0] * v.x[0] + u.y[1] * v.y[1] + u.z[2] * v.z[2]; 
-// }
-// inline vec3 cross(const vec3 &u, const vec3 &v) {
-//     return vec3(u.y[1] * v.z[2] - u.z[2] * v.y[1], 
-//                 u.z[2] * v.x[0] - u.x[0] * v.z[2], 
-//                 u.x[0] * v.y[1] - u.y[1] * v.x[0]);
-// }
-// inline vec3 unit_vector(vec3 v) {
-//     return v / v.length(); 
-// }
-
-// //add aliases for vec3 //copilot
-// using point3 = vec3; // 3D point
-// using color = vec3; // RGB color
