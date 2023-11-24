@@ -3,7 +3,6 @@
 #include <vector>
 #include <memory>
 
-#include "raytracer.h"
 #include "scene.h"
 #include "shape.h"
 #include "vec3.h"

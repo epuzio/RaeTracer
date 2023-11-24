@@ -1,4 +1,3 @@
-#include "raytracer.h"
 #include "camera.h"
 #include "shape.h"
 #include "scene.h"

@@ -1,7 +1,6 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "raytracer.h"
 #include "scene.h"
 #include "vec3.h"
 
@@ -100,7 +99,7 @@ class camera {
         } else{
             hit_record rec;
             if(rendermode == "binary"){
-                if(world.hit(r, 0, infinity, rec)) {
+                if(world.hit(r, 0, INFINITY, rec)) {
                     return color(1.0, 0.0, 0.0);
                 }
                 return color(0, 0, 0);
@@ -108,7 +107,7 @@ class camera {
 
             if(rendermode == "phong"){
                 hit_record rec;
-                if (world.hit(r, 0, infinity, rec)) {
+                if (world.hit(r, 0, INFINITY, rec)) {
                     //Calculate local contribution based on the material's reflectivity
                     double localContribution = (rec.bp->isreflective) ? 1.0 - rec.bp->reflectivity : 1.0; 
                     vec3 pixelColor(0.0, 0.0, 0.0);

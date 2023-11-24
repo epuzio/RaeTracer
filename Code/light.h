@@ -1,7 +1,6 @@
 #ifndef LIGHT_H
 #define LIGHT_H 
 
-#include "raytracer.h"
 #include "scene.h"
 #include "vec3.h"
 

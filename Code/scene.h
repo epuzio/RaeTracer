@@ -10,7 +10,7 @@
 using std::shared_ptr;
 using std::make_shared;
 
-//This class stores all the objects in a scene (lights, bkg color and shapes) :P
+//This class stores all the objects in a scene (lights, bkg color and shapes)
 class scene : public shape {
   public:
     vector<shared_ptr<shape> > objects;

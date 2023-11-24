@@ -86,7 +86,7 @@ class triangle : public shape {
     return vec3(vec3::max(vec3::max(v0, v1), v2));
   }
 
-  vec3 centroid() const { //added by copilot
+  vec3 centroid() const {
     return (v0 + v1 + v2) / 3;
   }
 

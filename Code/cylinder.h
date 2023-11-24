@@ -68,7 +68,7 @@ class cylinder : public shape {
           double radius = sqrt(localCoord.x * localCoord.x + localCoord.y * localCoord.y); // Distance from the origin
   
           // Map the polar coordinates to the UV space
-          double u = (theta + pi) / (2 * pi); // Normalize theta to [0, 1]
+          double u = (theta + M_PI) / (2 * M_PI); // Normalize theta to [0, 1]
           double v = (localCoord.z + height) / (2 * height); // Normalize radius to [0, 1] based on cylinder's height
   
           // Map normalized coordinates to texture space
@@ -87,7 +87,7 @@ class cylinder : public shape {
         double radius = sqrt(localCoord.x * localCoord.x + localCoord.y * localCoord.y); // Distance from the origin
 
         // Map the polar coordinates to the UV space
-        double u = (theta + pi) / (2 * pi); // Normalize theta to [0, 1]
+        double u = (theta + M_PI) / (2 * M_PI); // Normalize theta to [0, 1]
         double v = (radius + this->radius) / (2 * this->radius); // Normalize radius to [0, 1] based on cylinder's height
 
         // Map normalized coordinates to texture space
