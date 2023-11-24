@@ -1,0 +1,60 @@
+Feature List
+
+Basic Raytracing Features. . . . . . . . . . . . . . . . . . . . . . .
+
+(a) Camera
+    I have fully implemented the Camera object. I have demonstrated it working fully for binary and
+    blinn-phong renders using the test suite provided (binary_scene.ppm, binary.ppm, mirror_image.ppm, 
+    phong_scene.ppm and simple_phong.ppm).
+
+(b) Intersection tests
+    I have fully implemented intersection tests for spheres, cylinders and triangles.  I have demonstrated it 
+    working fully for binary and blinn-phong renders using the test suite provided (binary_scene.ppm, binary.ppm,
+    mirror_image.ppm, phong_scene.ppm and simple_phong.ppm).
+
+(c) Blinn-Phong shading 
+    I have fully implemented Blinn-Phong shading. I have demonstrated it working (albeit with some bugs),
+    using the test suite provided (mirror_image.ppm, phong_scene.ppm and simple_phong.ppm).
+
+(d) Shadows
+    I have fully implemented shadows within the Blinn-Phong shader. I have demonstrated it working 
+    using the test suite provided (mirror_image.ppm, phong_scene.ppm and simple_phong.ppm).
+
+(e) Tone mapping 
+    I have implemented linear tone mapping. I have demonstrated it through the test suite provided 
+    (mirror_image.ppm, phong_scene.ppm and simple_phong.ppm).
+
+(f) Reflection 
+    I have implemented reflection. I have demonstrated reflections through the test suite provided 
+    (mirror_image.ppm and phong_scene.ppm).
+
+(g) Refraction 
+    I have partially implemented refraction, and have not demonstrated this feature through the test suite.
+
+
+
+2. Intermediate raytracer features. . . . . . . . . . . . . . . . . . . . . . .
+
+(a) Textures
+    I have fully implemented textures for spheres and triangles, and partially implemented textures for cylinder. I have demonstrated
+    this feature through texture.ppm and simple_phong_with_texture.ppm, both of which are listed in "Resources".
+
+(b) Acceleration hierarchy
+    I began implementing this feature, but was not able to complete it before the submission deadline.
+    My work-in-progress code for the acceleration hierarchy can be found in box.h.
+
+
+
+3. Pathtracer . . . . . . . . . . . . . . . . . . . . . . .
+
+(a) Pixel sampling
+    I did not implement this feature.
+
+(b) Lens sampling
+    I did not implement this feature.
+
+(c) BRDF sampling
+    I did not implement this feature.
+
+(d) Light sampling 
+    I did not implement this feature.
