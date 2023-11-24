@@ -115,7 +115,7 @@ inline vec3 normalize(vec3 v) {
     return v;
 }
 
-inline vec3 reflect(const vec3& incident, const vec3& normal) { //added by copilot from "inline vec3 reflect"
+inline vec3 reflect(const vec3& incident, const vec3& normal) {
     return incident - 2.0 * dot(incident, normal) * normal;
 }
 
