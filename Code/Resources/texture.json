@@ -40,8 +40,7 @@
                             "refractiveindex":1.0,
                             "hastexture": true,
                             "texturepath": "Resources/checkerboard_texture.ppm" 
-                        } 
-                    
+                        }     
                 },
                 {
                     "type": "cylinder",

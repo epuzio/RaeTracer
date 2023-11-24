@@ -7,7 +7,7 @@
 
 class pointlight { 
     public:
-        vec3 position; //bad practice to leave these public but oh well
+        vec3 position;
         vec3 intensity;
         pointlight(const vec3& pos, const vec3& intensity) : position(pos), intensity(intensity) {}
         vec3 getDirection(const vec3& point) const {

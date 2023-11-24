@@ -31,7 +31,7 @@ class camera {
     double exposure;
     
     //not from JSON input:
-    int numSamples = 3; //to prevent aliasing
+    int numSamples = 5; //to prevent aliasing
     double bias = 0.001; //to prevent shadow acne
     vec3 right, up, forward; //basis vectors for camera cameraPosition
 
@@ -109,7 +109,6 @@ class camera {
             if(rendermode == "phong"){
                 hit_record rec;
                 if (world.hit(r, 0, infinity, rec)) {
-
                     //Calculate local contribution based on the material's reflectivity
                     double localContribution = (rec.bp->isreflective) ? 1.0 - rec.bp->reflectivity : 1.0; 
                     vec3 pixelColor(0.0, 0.0, 0.0);
