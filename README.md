@@ -1,1 +1,1 @@
-RaeTracer is a basic C++ raytracer based on the Ray Tracing in One Weekend series. RaeTracer handles Phong Shading, reflections and texture mapping for basic geometric objects. 
+RaeTracer is a basic C++ raytracer based on the [Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html) series. RaeTracer handles Phong Shading, reflections and texture mapping for basic geometric objects. This raytracer was developed for INFR 11246 (Computer Graphics: Rendering) at the University of Edinburgh. 
